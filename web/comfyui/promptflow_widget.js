@@ -10,143 +10,122 @@ import { app } from "../../../scripts/app.js";
 import { api } from "../../../scripts/api.js";
 
 // ============================================================================
-// THEME SYSTEM (Matching FlowPath themes)
+// THEME SYSTEM (Matching FlowPath themes exactly)
 // ============================================================================
 
-// Theme definitions matching FlowPath for consistency
+// Theme definitions - exact match to FlowPath
 const THEMES = {
     ocean: {
         name: "Ocean Blue",
-        background: "#0a1e32",
-        surface: "#0f2942",
-        surfaceHover: "#153552",
-        border: "#1e4a6a",
-        borderFocus: "#4299e1",
+        primary: "#4299e1",
+        primaryLight: "rgba(66, 153, 225, 0.3)",
+        primaryDark: "rgba(66, 153, 225, 0.6)",
+        gradient: "linear-gradient(135deg, rgba(66, 153, 225, 0.2), rgba(20, 184, 166, 0.1))",
+        accent: "#14b8a6",
+        secondary: "#60a5fa",
+        background: "linear-gradient(180deg, rgba(10, 30, 50, 0.5) 0%, rgba(20, 60, 80, 0.3) 100%)",
         text: "#e2e8f0",
         textMuted: "#94a3b8",
         textDim: "#64748b",
-        accent: "#4299e1",
-        accentHover: "#63b3ed",
-        accentText: "#ffffff",
         success: "#14b8a6",
         warning: "#f59e0b",
-        error: "#ef4444",
-        scrollbar: "#1e4a6a",
-        scrollbarHover: "#2d6a9a"
+        error: "#ef4444"
     },
     forest: {
         name: "Forest Green",
-        background: "#0a1e14",
-        surface: "#0f2a1c",
-        surfaceHover: "#153a28",
-        border: "#1e5a3a",
-        borderFocus: "#10b981",
+        primary: "#10b981",
+        primaryLight: "rgba(16, 185, 129, 0.3)",
+        primaryDark: "rgba(16, 185, 129, 0.6)",
+        gradient: "linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(217, 119, 6, 0.1))",
+        accent: "#d97706",
+        secondary: "#34d399",
+        background: "linear-gradient(180deg, rgba(10, 30, 20, 0.5) 0%, rgba(30, 50, 30, 0.3) 100%)",
         text: "#e2e8f0",
         textMuted: "#94a3b8",
         textDim: "#64748b",
-        accent: "#10b981",
-        accentHover: "#34d399",
-        accentText: "#ffffff",
         success: "#10b981",
         warning: "#d97706",
-        error: "#ef4444",
-        scrollbar: "#1e5a3a",
-        scrollbarHover: "#2d7a4a"
+        error: "#ef4444"
     },
     pinkpony: {
         name: "Pink Pony Club",
-        background: "#321428",
-        surface: "#4a1e3a",
-        surfaceHover: "#5a284a",
-        border: "#7a3a5a",
-        borderFocus: "#ec4899",
+        primary: "#ec4899",
+        primaryLight: "rgba(236, 72, 153, 0.3)",
+        primaryDark: "rgba(236, 72, 153, 0.6)",
+        gradient: "linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(255, 255, 255, 0.15))",
+        accent: "#ffffff",
+        secondary: "#f472b6",
+        background: "linear-gradient(180deg, rgba(50, 20, 40, 0.5) 0%, rgba(80, 30, 60, 0.3) 100%)",
         text: "#fce7f3",
         textMuted: "#f9a8d4",
         textDim: "#db70a8",
-        accent: "#ec4899",
-        accentHover: "#f472b6",
-        accentText: "#ffffff",
         success: "#22c55e",
         warning: "#f59e0b",
-        error: "#ef4444",
-        scrollbar: "#7a3a5a",
-        scrollbarHover: "#9a4a7a"
+        error: "#ef4444"
     },
     odie: {
         name: "Odie",
-        background: "#28190f",
-        surface: "#3d2518",
-        surfaceHover: "#4d3020",
-        border: "#6d4530",
-        borderFocus: "#f97316",
+        primary: "#f97316",
+        primaryLight: "rgba(249, 115, 22, 0.3)",
+        primaryDark: "rgba(249, 115, 22, 0.6)",
+        gradient: "linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(212, 165, 116, 0.15))",
+        accent: "#d4a574",
+        secondary: "#fb923c",
+        background: "linear-gradient(180deg, rgba(40, 25, 15, 0.5) 0%, rgba(60, 40, 25, 0.3) 100%)",
         text: "#fef3c7",
         textMuted: "#d4a574",
         textDim: "#a67c52",
-        accent: "#f97316",
-        accentHover: "#fb923c",
-        accentText: "#ffffff",
         success: "#22c55e",
         warning: "#f59e0b",
-        error: "#ef4444",
-        scrollbar: "#6d4530",
-        scrollbarHover: "#8d5540"
+        error: "#ef4444"
     },
     umbrael: {
         name: "Umbrael's Umbrage",
-        background: "#110818",
-        surface: "#1a1025",
-        surfaceHover: "#251535",
-        border: "#3a2050",
-        borderFocus: "#9333ea",
+        primary: "#9333ea",
+        primaryLight: "rgba(147, 51, 234, 0.3)",
+        primaryDark: "rgba(147, 51, 234, 0.6)",
+        gradient: "linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(251, 191, 36, 0.1))",
+        accent: "#fbbf24",
+        secondary: "#a855f7",
+        background: "linear-gradient(180deg, rgba(17, 24, 39, 0.6) 0%, rgba(30, 20, 50, 0.4) 100%)",
         text: "#e2e8f0",
         textMuted: "#a78bfa",
         textDim: "#7c5dba",
-        accent: "#9333ea",
-        accentHover: "#a855f7",
-        accentText: "#ffffff",
         success: "#22c55e",
         warning: "#fbbf24",
-        error: "#ef4444",
-        scrollbar: "#3a2050",
-        scrollbarHover: "#4a3060"
+        error: "#ef4444"
     },
     plainjane: {
         name: "Plain Jane",
-        background: "#1e1e23",
-        surface: "#28282e",
-        surfaceHover: "#323238",
-        border: "#404048",
-        borderFocus: "#6b7280",
+        primary: "#6b7280",
+        primaryLight: "rgba(107, 114, 128, 0.3)",
+        primaryDark: "rgba(107, 114, 128, 0.6)",
+        gradient: "linear-gradient(135deg, rgba(107, 114, 128, 0.15), rgba(156, 163, 175, 0.1))",
+        accent: "#9ca3af",
+        secondary: "#4b5563",
+        background: "linear-gradient(180deg, rgba(30, 30, 35, 0.5) 0%, rgba(40, 40, 45, 0.3) 100%)",
         text: "#e2e8f0",
         textMuted: "#9ca3af",
         textDim: "#6b7280",
-        accent: "#6b7280",
-        accentHover: "#9ca3af",
-        accentText: "#ffffff",
         success: "#22c55e",
         warning: "#f59e0b",
-        error: "#ef4444",
-        scrollbar: "#404048",
-        scrollbarHover: "#505058"
+        error: "#ef4444"
     },
     batman: {
         name: "The Dark Knight",
-        background: "#0a0a0a",
-        surface: "#141414",
-        surfaceHover: "#1e1e1e",
-        border: "#2a2a2a",
-        borderFocus: "#ffcc00",
+        primary: "#1a1a1a",
+        primaryLight: "rgba(26, 26, 26, 0.5)",
+        primaryDark: "rgba(0, 0, 0, 0.8)",
+        gradient: "linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(255, 204, 0, 0.05))",
+        accent: "#ffcc00",
+        secondary: "#333333",
+        background: "linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(15, 15, 8, 0.6) 100%)",
         text: "#e2e8f0",
         textMuted: "#9ca3af",
         textDim: "#6b7280",
-        accent: "#ffcc00",
-        accentHover: "#ffd633",
-        accentText: "#000000",
         success: "#22c55e",
         warning: "#ffcc00",
-        error: "#ef4444",
-        scrollbar: "#2a2a2a",
-        scrollbarHover: "#3a3a3a"
+        error: "#ef4444"
     }
 };
 
@@ -495,6 +474,7 @@ function createStyles(theme) {
             gap: 8px;
             padding: 12px;
             background: ${theme.background};
+            border: 1px solid ${theme.primaryLight};
             border-radius: 8px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             font-size: 12px;
@@ -509,32 +489,35 @@ function createStyles(theme) {
         }
         
         .promptflow-container::-webkit-scrollbar-track {
-            background: ${theme.background};
+            background: transparent;
             border-radius: 4px;
         }
         
         .promptflow-container::-webkit-scrollbar-thumb {
-            background: ${theme.scrollbar};
+            background: ${theme.primaryLight};
             border-radius: 4px;
         }
         
         .promptflow-container::-webkit-scrollbar-thumb:hover {
-            background: ${theme.scrollbarHover};
+            background: ${theme.primaryDark};
         }
         
         .promptflow-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 8px;
-            border-bottom: 1px solid ${theme.border};
+            padding: 8px 10px;
+            background: ${theme.gradient};
+            border: 1px solid ${theme.primaryLight};
+            border-radius: 6px;
             margin-bottom: 4px;
         }
         
         .promptflow-title {
             font-size: 14px;
             font-weight: 600;
-            color: ${theme.text};
+            color: ${theme.primary};
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         
         .promptflow-controls {
@@ -546,38 +529,44 @@ function createStyles(theme) {
         .promptflow-mode-select,
         .promptflow-preset-select {
             padding: 4px 8px;
-            background: ${theme.surface};
-            border: 1px solid ${theme.border};
+            background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.3));
+            border: 1px solid ${theme.primaryLight};
             border-radius: 4px;
             color: ${theme.text};
             font-size: 11px;
             cursor: pointer;
             outline: none;
+            transition: all 0.2s;
         }
         
         .promptflow-mode-select:hover,
         .promptflow-preset-select:hover {
-            background: ${theme.surfaceHover};
+            border-color: ${theme.primary};
+            box-shadow: 0 0 0 2px ${theme.primaryLight};
         }
         
         .promptflow-mode-select:focus,
         .promptflow-preset-select:focus {
-            border-color: ${theme.borderFocus};
+            border-color: ${theme.primary};
+            box-shadow: 0 0 0 2px ${theme.primaryLight};
         }
         
         .promptflow-save-btn {
-            padding: 4px 8px;
-            background: ${theme.accent};
+            padding: 4px 10px;
+            background: linear-gradient(135deg, ${theme.primary}, ${theme.secondary});
             border: none;
             border-radius: 4px;
-            color: ${theme.accentText};
+            color: #ffffff;
             font-size: 11px;
+            font-weight: 500;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
         .promptflow-save-btn:hover {
-            background: ${theme.accentHover};
+            box-shadow: 0 4px 8px ${theme.primaryLight};
+            transform: translateY(-1px);
         }
         
         .promptflow-fields {
@@ -591,6 +580,10 @@ function createStyles(theme) {
             display: flex;
             flex-direction: column;
             gap: 4px;
+            padding: 8px;
+            background: ${theme.gradient};
+            border: 1px solid ${theme.primaryLight};
+            border-radius: 6px;
         }
         
         .promptflow-field-header {
@@ -601,8 +594,8 @@ function createStyles(theme) {
         
         .promptflow-field-label {
             font-size: 11px;
-            font-weight: 500;
-            color: ${theme.textMuted};
+            font-weight: 600;
+            color: ${theme.primary};
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -614,10 +607,10 @@ function createStyles(theme) {
         }
         
         .promptflow-preset-btn {
-            padding: 2px 6px;
-            background: transparent;
-            border: 1px solid ${theme.border};
-            border-radius: 3px;
+            padding: 3px 8px;
+            background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.2));
+            border: 1px solid ${theme.primaryLight};
+            border-radius: 4px;
             color: ${theme.textMuted};
             font-size: 10px;
             cursor: pointer;
@@ -625,24 +618,24 @@ function createStyles(theme) {
         }
         
         .promptflow-preset-btn:hover {
-            background: ${theme.surface};
-            border-color: ${theme.accent};
-            color: ${theme.accent};
+            border-color: ${theme.primary};
+            color: ${theme.primary};
+            box-shadow: 0 0 0 2px ${theme.primaryLight};
         }
         
         .promptflow-field-textarea {
             width: 100%;
             min-height: 50px;
             padding: 8px;
-            background: ${theme.surface};
-            border: 1px solid ${theme.border};
+            background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.3));
+            border: 1px solid ${theme.primaryLight};
             border-radius: 4px;
             color: ${theme.text};
             font-size: 12px;
             font-family: inherit;
             resize: vertical;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
         }
         
         .promptflow-field-textarea::placeholder {
@@ -650,15 +643,21 @@ function createStyles(theme) {
         }
         
         .promptflow-field-textarea:focus {
-            border-color: ${theme.borderFocus};
+            border-color: ${theme.primary};
+            box-shadow: 0 0 0 2px ${theme.primaryLight};
         }
         
         /* Extended Mode Accordion */
         .promptflow-accordion {
-            background: ${theme.surface};
-            border: 1px solid ${theme.border};
+            background: ${theme.gradient};
+            border: 1px solid ${theme.primaryLight};
             border-radius: 6px;
             overflow: hidden;
+            transition: all 0.2s;
+        }
+        
+        .promptflow-accordion:hover {
+            border-color: ${theme.primary};
         }
         
         .promptflow-accordion-header {
@@ -666,14 +665,14 @@ function createStyles(theme) {
             justify-content: space-between;
             align-items: center;
             padding: 8px 10px;
-            background: ${theme.surface};
+            background: transparent;
             cursor: pointer;
             user-select: none;
             transition: background 0.2s;
         }
         
         .promptflow-accordion-header:hover {
-            background: ${theme.surfaceHover};
+            background: ${theme.primaryLight};
         }
         
         .promptflow-accordion-left {
@@ -684,7 +683,7 @@ function createStyles(theme) {
         
         .promptflow-accordion-toggle {
             font-size: 10px;
-            color: ${theme.textMuted};
+            color: ${theme.primary};
             transition: transform 0.2s;
         }
         
@@ -706,11 +705,12 @@ function createStyles(theme) {
         
         .promptflow-mode-badge {
             padding: 2px 6px;
-            background: ${theme.background};
+            background: ${theme.primaryLight};
             border-radius: 3px;
             font-size: 9px;
-            color: ${theme.textMuted};
+            color: ${theme.accent};
             text-transform: uppercase;
+            font-weight: 600;
         }
         
         .promptflow-drag-handle {
@@ -722,7 +722,7 @@ function createStyles(theme) {
         }
         
         .promptflow-drag-handle:hover {
-            color: ${theme.textMuted};
+            color: ${theme.primary};
         }
         
         .promptflow-drag-handle:active {
@@ -731,12 +731,14 @@ function createStyles(theme) {
         
         .promptflow-accordion.dragging {
             opacity: 0.5;
-            border-color: ${theme.accent};
+            border-color: ${theme.primary};
+            box-shadow: 0 0 8px ${theme.primaryLight};
         }
         
         .promptflow-accordion.drag-over {
             border-color: ${theme.accent};
             border-style: dashed;
+            background: ${theme.primaryLight};
         }
         
         .promptflow-accordion-content {
@@ -751,21 +753,25 @@ function createStyles(theme) {
         /* Negative Section */
         .promptflow-negative {
             margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid ${theme.border};
+            padding: 8px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 6px;
         }
         
         /* Preview Section */
         .promptflow-preview {
             margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid ${theme.border};
+            padding: 8px;
+            background: ${theme.gradient};
+            border: 1px solid ${theme.primaryLight};
+            border-radius: 6px;
         }
         
         .promptflow-preview-label {
             font-size: 11px;
-            font-weight: 500;
-            color: ${theme.textMuted};
+            font-weight: 600;
+            color: ${theme.primary};
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 6px;
@@ -773,10 +779,10 @@ function createStyles(theme) {
         
         .promptflow-preview-text {
             padding: 8px;
-            background: ${theme.surface};
-            border: 1px solid ${theme.border};
+            background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.2));
+            border: 1px solid ${theme.primaryLight};
             border-radius: 4px;
-            color: ${theme.textDim};
+            color: ${theme.text};
             font-size: 11px;
             line-height: 1.4;
             max-height: 80px;
@@ -787,8 +793,10 @@ function createStyles(theme) {
         /* Variations Panel */
         .promptflow-variations {
             margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid ${theme.border};
+            padding: 8px;
+            background: ${theme.gradient};
+            border: 1px solid ${theme.primaryLight};
+            border-radius: 6px;
         }
         
         .promptflow-variations-header {
@@ -811,16 +819,16 @@ function createStyles(theme) {
         
         .promptflow-variations-label {
             font-size: 11px;
-            font-weight: 500;
-            color: ${theme.textMuted};
+            font-weight: 600;
+            color: ${theme.primary};
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
         .promptflow-variations-count {
             padding: 2px 8px;
-            background: ${theme.accent};
-            color: ${theme.accentText};
+            background: linear-gradient(135deg, ${theme.primary}, ${theme.secondary});
+            color: #ffffff;
             border-radius: 10px;
             font-size: 10px;
             font-weight: 600;
@@ -828,7 +836,7 @@ function createStyles(theme) {
         
         .promptflow-variations-toggle {
             font-size: 10px;
-            color: ${theme.textMuted};
+            color: ${theme.primary};
             transition: transform 0.2s;
         }
         
@@ -851,7 +859,8 @@ function createStyles(theme) {
             align-items: center;
             margin-bottom: 8px;
             padding: 6px 8px;
-            background: ${theme.surface};
+            background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.2));
+            border: 1px solid ${theme.primaryLight};
             border-radius: 4px;
             font-size: 11px;
             color: ${theme.textMuted};
@@ -865,7 +874,7 @@ function createStyles(theme) {
         .promptflow-variations-btn {
             padding: 3px 8px;
             background: transparent;
-            border: 1px solid ${theme.border};
+            border: 1px solid ${theme.primaryLight};
             border-radius: 3px;
             color: ${theme.textMuted};
             font-size: 10px;
@@ -874,16 +883,17 @@ function createStyles(theme) {
         }
         
         .promptflow-variations-btn:hover {
-            background: ${theme.surface};
-            border-color: ${theme.accent};
-            color: ${theme.accent};
+            background: ${theme.primaryLight};
+            border-color: ${theme.primary};
+            color: ${theme.primary};
         }
         
         .promptflow-variations-list {
             max-height: 200px;
             overflow-y: auto;
-            border: 1px solid ${theme.border};
+            border: 1px solid ${theme.primaryLight};
             border-radius: 4px;
+            background: linear-gradient(135deg, rgba(0,0,0,0.2), rgba(0,0,0,0.1));
         }
         
         .promptflow-variation-item {
@@ -891,7 +901,7 @@ function createStyles(theme) {
             align-items: flex-start;
             gap: 8px;
             padding: 6px 8px;
-            border-bottom: 1px solid ${theme.border};
+            border-bottom: 1px solid ${theme.primaryLight};
             font-size: 11px;
             color: ${theme.text};
             transition: background 0.2s;
@@ -902,7 +912,7 @@ function createStyles(theme) {
         }
         
         .promptflow-variation-item:hover {
-            background: ${theme.surfaceHover};
+            background: ${theme.primaryLight};
         }
         
         .promptflow-variation-index {
@@ -912,10 +922,11 @@ function createStyles(theme) {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: ${theme.background};
+            background: ${theme.primaryLight};
             border-radius: 3px;
             font-size: 10px;
-            color: ${theme.textDim};
+            color: ${theme.accent};
+            font-weight: 600;
         }
         
         .promptflow-variation-text {
@@ -941,7 +952,7 @@ function createStyles(theme) {
         }
         
         .promptflow-variation-copy:hover {
-            color: ${theme.accent};
+            color: ${theme.primary};
         }
         
         .promptflow-no-variations {
@@ -956,8 +967,8 @@ function createStyles(theme) {
             width: 100%;
             min-height: 150px;
             padding: 10px;
-            background: ${theme.background};
-            border: 1px solid ${theme.border};
+            background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.3));
+            border: 1px solid ${theme.primaryLight};
             border-radius: 4px;
             color: ${theme.text};
             font-size: 12px;
@@ -968,7 +979,8 @@ function createStyles(theme) {
         }
         
         .promptflow-autosort-textarea:focus {
-            border-color: ${theme.borderFocus};
+            border-color: ${theme.primary};
+            box-shadow: 0 0 0 2px ${theme.primaryLight};
         }
         
         .promptflow-autosort-textarea::placeholder {
@@ -978,8 +990,8 @@ function createStyles(theme) {
         .promptflow-autosort-preview {
             margin-bottom: 12px;
             padding: 10px;
-            background: ${theme.surface};
-            border: 1px solid ${theme.border};
+            background: ${theme.gradient};
+            border: 1px solid ${theme.primaryLight};
             border-radius: 4px;
             max-height: 200px;
             overflow-y: auto;
@@ -1017,11 +1029,12 @@ function createStyles(theme) {
             position: fixed;
             z-index: 10001;
             min-width: 150px;
-            background: ${theme.surface};
-            border: 1px solid ${theme.border};
+            background: linear-gradient(180deg, rgba(30, 30, 40, 0.98), rgba(20, 20, 30, 0.98));
+            border: 1px solid ${theme.primaryLight};
             border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             padding: 4px 0;
+            backdrop-filter: blur(10px);
         }
         
         .promptflow-context-item {
@@ -1032,11 +1045,12 @@ function createStyles(theme) {
             font-size: 12px;
             color: ${theme.text};
             cursor: pointer;
-            transition: background 0.15s;
+            transition: all 0.15s;
         }
         
         .promptflow-context-item:hover {
-            background: ${theme.surfaceHover};
+            background: ${theme.primaryLight};
+            color: ${theme.primary};
         }
         
         .promptflow-context-item.danger {
@@ -1044,12 +1058,12 @@ function createStyles(theme) {
         }
         
         .promptflow-context-item.danger:hover {
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(239, 68, 68, 0.2);
         }
         
         .promptflow-context-divider {
             height: 1px;
-            background: ${theme.border};
+            background: ${theme.primaryLight};
             margin: 4px 0;
         }
         
@@ -1077,10 +1091,11 @@ function createStyles(theme) {
             min-width: 180px;
             max-height: 250px;
             overflow-y: auto;
-            background: ${theme.surface};
-            border: 1px solid ${theme.border};
+            background: linear-gradient(180deg, rgba(30, 30, 40, 0.98), rgba(20, 20, 30, 0.98));
+            border: 1px solid ${theme.primaryLight};
             border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
         }
         
         .promptflow-preset-item {
@@ -1089,8 +1104,8 @@ function createStyles(theme) {
             padding: 8px 12px;
             font-size: 12px;
             color: ${theme.text};
-            border-bottom: 1px solid ${theme.border};
-            transition: background 0.2s;
+            border-bottom: 1px solid ${theme.primaryLight};
+            transition: all 0.2s;
         }
         
         .promptflow-preset-item:last-child {
@@ -1098,7 +1113,7 @@ function createStyles(theme) {
         }
         
         .promptflow-preset-item:hover {
-            background: ${theme.surfaceHover};
+            background: ${theme.primaryLight};
         }
         
         .promptflow-preset-item-content {
@@ -1141,12 +1156,13 @@ function createStyles(theme) {
         }
         
         .promptflow-preset-divider {
-            padding: 4px 12px;
+            padding: 6px 12px;
             font-size: 10px;
-            color: ${theme.textDim};
-            background: ${theme.background};
+            color: ${theme.primary};
+            background: ${theme.primaryLight};
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 600;
         }
         
         /* Save Preset Modal */
@@ -1156,43 +1172,46 @@ function createStyles(theme) {
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 10000;
+            backdrop-filter: blur(4px);
         }
         
         .promptflow-modal {
-            background: ${theme.surface};
-            border: 1px solid ${theme.border};
+            background: linear-gradient(180deg, rgba(30, 30, 40, 0.98), rgba(20, 20, 30, 0.98));
+            border: 1px solid ${theme.primaryLight};
             border-radius: 8px;
             padding: 20px;
             min-width: 300px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
         }
         
         .promptflow-modal-title {
             font-size: 14px;
             font-weight: 600;
-            color: ${theme.text};
+            color: ${theme.primary};
             margin-bottom: 16px;
         }
         
         .promptflow-modal-input {
             width: 100%;
             padding: 8px 12px;
-            background: ${theme.background};
-            border: 1px solid ${theme.border};
+            background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.3));
+            border: 1px solid ${theme.primaryLight};
             border-radius: 4px;
             color: ${theme.text};
             font-size: 12px;
             outline: none;
             margin-bottom: 16px;
+            transition: all 0.2s;
         }
         
         .promptflow-modal-input:focus {
-            border-color: ${theme.borderFocus};
+            border-color: ${theme.primary};
+            box-shadow: 0 0 0 2px ${theme.primaryLight};
         }
         
         .promptflow-modal-buttons {
@@ -1211,22 +1230,25 @@ function createStyles(theme) {
         
         .promptflow-modal-btn.cancel {
             background: transparent;
-            border: 1px solid ${theme.border};
+            border: 1px solid ${theme.primaryLight};
             color: ${theme.textMuted};
         }
         
         .promptflow-modal-btn.cancel:hover {
-            background: ${theme.surfaceHover};
+            background: ${theme.primaryLight};
+            color: ${theme.text};
         }
         
         .promptflow-modal-btn.save {
-            background: ${theme.accent};
+            background: linear-gradient(135deg, ${theme.primary}, ${theme.secondary});
             border: none;
-            color: ${theme.accentText};
+            color: #ffffff;
+            font-weight: 500;
         }
         
         .promptflow-modal-btn.save:hover {
-            background: ${theme.accentHover};
+            box-shadow: 0 4px 12px ${theme.primaryLight};
+            transform: translateY(-1px);
         }
     `;
 }
