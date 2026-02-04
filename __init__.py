@@ -82,7 +82,7 @@ async def get_preset_type(request):
 
 
 # Version info
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]
 
 print(f"[PromptFlow] v{__version__} loaded successfully")

@@ -1,13 +1,14 @@
 [project]
 name = "comfyui-promptflow"
-description = "Modular prompt engineering tool for ComfyUI with presets, wildcards, and LoRA Manager integration"
-version = "1.0.0"
+description = "Modular prompt engineering tool for ComfyUI with presets, wildcards, auto-categorize, and LoRA Manager integration"
+version = "1.1.0"
 license = { text = "MIT" }
 authors = [
-    { name = "Maarten Harms", email = "maarten@example.com" }
+    { name = "Maarten Harms" }
 ]
 readme = "README.md"
 requires-python = ">=3.8"
+keywords = ["comfyui", "prompt", "engineering", "wildcards", "presets", "stable-diffusion"]
 
 [project.urls]
 Repository = "https://github.com/maartenharms/comfyui-promptflow"
