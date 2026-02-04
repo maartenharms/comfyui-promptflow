@@ -1810,11 +1810,18 @@ class PromptFlowWidget {
     }
     
     getCurrentPromptText() {
-        const fields = this.data.mode === "simple" ? SIMPLE_FIELDS : EXTENDED_FIELDS;
-        const parts = [];
+        // Use categoryOrder for extended mode to respect drag-drop reordering
+        let fieldIds;
+        if (this.data.mode === "simple") {
+            fieldIds = SIMPLE_FIELDS.map(f => f.id);
+        } else {
+            // Use custom order if available, otherwise default
+            fieldIds = this.data.categoryOrder || EXTENDED_FIELDS.map(f => f.id);
+        }
         
-        for (const field of fields) {
-            const value = this.data.categories[field.id]?.value?.trim();
+        const parts = [];
+        for (const fieldId of fieldIds) {
+            const value = this.data.categories[fieldId]?.value?.trim();
             if (value) {
                 parts.push(value);
             }
