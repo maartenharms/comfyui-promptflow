@@ -1,0 +1,20 @@
+[project]
+name = "comfyui-promptflow"
+description = "Modular prompt engineering tool for ComfyUI with presets, wildcards, and LoRA Manager integration"
+version = "1.0.0"
+license = { text = "MIT" }
+authors = [
+    { name = "Maarten Harms", email = "maarten@example.com" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+
+[project.urls]
+Repository = "https://github.com/maartenharms/comfyui-promptflow"
+"Bug Tracker" = "https://github.com/maartenharms/comfyui-promptflow/issues"
+"Ko-fi" = "https://ko-fi.com/maartenharms"
+
+[tool.comfy]
+PublisherId = "maartenharms"
+DisplayName = "PromptFlow"
+Icon = ""

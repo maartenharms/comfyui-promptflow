@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Standard",
+        "value": "masterpiece, best quality, highly detailed"
+    },
+    {
+        "name": "Ultra",
+        "value": "masterpiece, best quality, 8k uhd, ultra detailed, intricate details, sharp focus, professional"
+    },
+    {
+        "name": "Minimal",
+        "value": "best quality"
+    },
+    {
+        "name": "Photo Quality",
+        "value": "RAW photo, high resolution, ultra sharp, professional photography, 8k"
+    },
+    {
+        "name": "Artistic",
+        "value": "masterpiece, award winning, gallery quality, artistic excellence"
+    }
+]

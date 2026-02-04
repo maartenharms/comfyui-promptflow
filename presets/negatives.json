@@ -1,0 +1,30 @@
+[
+    {
+        "name": "Standard",
+        "value": "low quality, worst quality, blurry, watermark, text, signature, username, artist name"
+    },
+    {
+        "name": "Anatomy",
+        "value": "bad hands, extra fingers, missing fingers, fused fingers, too many fingers, bad anatomy, deformed, mutated, malformed limbs, extra limbs, missing limbs"
+    },
+    {
+        "name": "Artifacts",
+        "value": "jpeg artifacts, compression artifacts, noise, pixelated, oversaturated, undersaturated"
+    },
+    {
+        "name": "Full (Recommended)",
+        "value": "low quality, worst quality, blurry, watermark, text, signature, bad hands, extra fingers, missing fingers, fused fingers, bad anatomy, deformed, mutated, malformed limbs, extra limbs, jpeg artifacts, noise"
+    },
+    {
+        "name": "NSFW Filter",
+        "value": "nsfw, nude, naked, explicit, adult content, pornographic"
+    },
+    {
+        "name": "Photo Negatives",
+        "value": "illustration, painting, drawing, art, sketch, cartoon, anime, 3d render, cgi"
+    },
+    {
+        "name": "Anime Negatives",
+        "value": "photo, realistic, 3d, render, photography, real life"
+    }
+]

@@ -1,0 +1,42 @@
+[
+    {
+        "name": "Photorealistic",
+        "value": "photorealistic, hyperrealistic, photo, realistic skin texture, natural lighting"
+    },
+    {
+        "name": "Cinematic",
+        "value": "cinematic, movie still, dramatic lighting, film grain, cinematic composition, depth of field"
+    },
+    {
+        "name": "Anime",
+        "value": "anime style, cel shading, vibrant colors, clean lines, anime aesthetic"
+    },
+    {
+        "name": "Oil Painting",
+        "value": "oil painting, visible brushstrokes, classical art, textured canvas, rich colors"
+    },
+    {
+        "name": "Watercolor",
+        "value": "watercolor painting, soft edges, color blending, artistic, delicate washes"
+    },
+    {
+        "name": "Digital Art",
+        "value": "digital art, trending on artstation, concept art, digital painting, highly detailed"
+    },
+    {
+        "name": "3D Render",
+        "value": "3d render, octane render, unreal engine 5, ray tracing, physically based rendering"
+    },
+    {
+        "name": "Comic Book",
+        "value": "comic book style, bold outlines, halftone dots, dynamic composition, graphic novel"
+    },
+    {
+        "name": "Fantasy Art",
+        "value": "fantasy art, magical atmosphere, ethereal lighting, epic scale, imaginative"
+    },
+    {
+        "name": "Portrait Photography",
+        "value": "professional portrait photography, studio lighting, shallow depth of field, sharp focus on face"
+    }
+]
