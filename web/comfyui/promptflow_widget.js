@@ -360,21 +360,48 @@ async function loadBuiltinPresets() {
     try {
         console.log("[PromptFlow] Loading built-in presets...");
         const response = await api.fetchApi("/promptflow/presets");
-        console.log("[PromptFlow] Preset API response status:", response.status);
         if (response.ok) {
             builtinPresets = await response.json();
-            console.log("[PromptFlow] Loaded presets:", builtinPresets);
+            console.log("[PromptFlow] Loaded", Object.values(builtinPresets).flat().length, "built-in presets");
         } else {
-            const errorText = await response.text();
-            console.warn("[PromptFlow] Failed to load built-in presets:", response.status, errorText);
+            console.warn("[PromptFlow] Preset API returned", response.status);
             builtinPresets = { styles: [], quality: [], negatives: [] };
         }
     } catch (e) {
-        console.warn("[PromptFlow] Error loading built-in presets:", e);
+        console.warn("[PromptFlow] Could not load built-in presets (extension may still be initializing):", e.message);
         builtinPresets = { styles: [], quality: [], negatives: [] };
     }
     
     return builtinPresets;
+}
+
+// Error notification helper
+function showNotification(message, type = "info") {
+    // Create notification element
+    const notification = document.createElement("div");
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 6px;
+        font-size: 13px;
+        z-index: 10002;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        ${type === "error" ? "background: #dc2626; color: white;" : ""}
+        ${type === "success" ? "background: #16a34a; color: white;" : ""}
+        ${type === "info" ? "background: #2563eb; color: white;" : ""}
+    `;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = "slideOut 0.3s ease";
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }
 
 function getCustomPresets(type) {
@@ -1008,6 +1035,17 @@ function createStyles(theme) {
             width: 16px;
             text-align: center;
             opacity: 0.7;
+        }
+        
+        /* Notification animations */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
         }
         
         /* Preset Dropdown */
@@ -2245,28 +2283,42 @@ class PromptFlowWidget {
     }
     
     exportPresets() {
-        const globalPresets = getCustomPresets("global");
-        const categoryPresets = getCustomPresets("categories");
-        
-        const exportData = {
-            version: "1.0",
-            exported: new Date().toISOString(),
-            global: globalPresets,
-            categories: categoryPresets
-        };
-        
-        // Create download
-        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `promptflow-presets-${new Date().toISOString().slice(0,10)}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        console.log("[PromptFlow] Exported presets:", globalPresets.length, "global,", Object.keys(categoryPresets).length, "category types");
+        try {
+            const globalPresets = getCustomPresets("global");
+            const categoryPresets = getCustomPresets("categories");
+            
+            const totalCount = globalPresets.length + 
+                Object.values(categoryPresets).reduce((sum, arr) => sum + arr.length, 0);
+            
+            if (totalCount === 0) {
+                showNotification("No custom presets to export", "info");
+                return;
+            }
+            
+            const exportData = {
+                version: "1.0",
+                exported: new Date().toISOString(),
+                global: globalPresets,
+                categories: categoryPresets
+            };
+            
+            // Create download
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `promptflow-presets-${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification(`Exported ${totalCount} presets`, "success");
+            console.log("[PromptFlow] Exported presets:", totalCount);
+        } catch (err) {
+            console.error("[PromptFlow] Export error:", err);
+            showNotification("Failed to export presets", "error");
+        }
     }
     
     importPresets() {
@@ -2285,37 +2337,47 @@ class PromptFlowWidget {
                     
                     // Validate structure
                     if (!importData.global && !importData.categories) {
-                        alert("Invalid preset file format");
+                        showNotification("Invalid preset file format", "error");
                         return;
                     }
+                    
+                    let importedCount = 0;
                     
                     // Merge global presets
                     if (importData.global && Array.isArray(importData.global)) {
                         const existing = getCustomPresets("global");
                         const merged = [...existing, ...importData.global];
                         localStorage.setItem(PRESET_STORAGE.global, JSON.stringify(merged));
+                        importedCount += importData.global.length;
                     }
                     
                     // Merge category presets
                     if (importData.categories && typeof importData.categories === "object") {
                         const existing = getCustomPresets("categories");
                         for (const [category, presets] of Object.entries(importData.categories)) {
+                            if (!Array.isArray(presets)) continue;
                             if (!existing[category]) {
                                 existing[category] = [];
                             }
                             existing[category] = [...existing[category], ...presets];
+                            importedCount += presets.length;
                         }
                         localStorage.setItem(PRESET_STORAGE.categories, JSON.stringify(existing));
                     }
                     
-                    console.log("[PromptFlow] Imported presets successfully");
-                    alert("Presets imported successfully!");
+                    showNotification(`Imported ${importedCount} presets`, "success");
+                    console.log("[PromptFlow] Imported", importedCount, "presets");
                     
                 } catch (err) {
                     console.error("[PromptFlow] Import error:", err);
-                    alert("Failed to import presets: " + err.message);
+                    showNotification("Failed to import: " + err.message, "error");
                 }
             };
+            
+            reader.onerror = () => {
+                showNotification("Failed to read file", "error");
+            };
+            
             reader.readAsText(file);
         });
         
