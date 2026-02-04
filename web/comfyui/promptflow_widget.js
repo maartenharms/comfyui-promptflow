@@ -579,6 +579,173 @@ function createStyles(theme) {
             word-break: break-word;
         }
         
+        /* Variations Panel */
+        .promptflow-variations {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid ${theme.border};
+        }
+        
+        .promptflow-variations-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 4px 0;
+        }
+        
+        .promptflow-variations-header:hover {
+            opacity: 0.8;
+        }
+        
+        .promptflow-variations-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .promptflow-variations-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: ${theme.textMuted};
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .promptflow-variations-count {
+            padding: 2px 8px;
+            background: ${theme.accent};
+            color: ${theme.accentText};
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .promptflow-variations-toggle {
+            font-size: 10px;
+            color: ${theme.textMuted};
+            transition: transform 0.2s;
+        }
+        
+        .promptflow-variations-toggle.expanded {
+            transform: rotate(90deg);
+        }
+        
+        .promptflow-variations-content {
+            display: none;
+            margin-top: 8px;
+        }
+        
+        .promptflow-variations-content.expanded {
+            display: block;
+        }
+        
+        .promptflow-variations-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 6px 8px;
+            background: ${theme.surface};
+            border-radius: 4px;
+            font-size: 11px;
+            color: ${theme.textMuted};
+        }
+        
+        .promptflow-variations-actions {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .promptflow-variations-btn {
+            padding: 3px 8px;
+            background: transparent;
+            border: 1px solid ${theme.border};
+            border-radius: 3px;
+            color: ${theme.textMuted};
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .promptflow-variations-btn:hover {
+            background: ${theme.surface};
+            border-color: ${theme.accent};
+            color: ${theme.accent};
+        }
+        
+        .promptflow-variations-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid ${theme.border};
+            border-radius: 4px;
+        }
+        
+        .promptflow-variation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 6px 8px;
+            border-bottom: 1px solid ${theme.border};
+            font-size: 11px;
+            color: ${theme.text};
+            transition: background 0.2s;
+        }
+        
+        .promptflow-variation-item:last-child {
+            border-bottom: none;
+        }
+        
+        .promptflow-variation-item:hover {
+            background: ${theme.surfaceHover};
+        }
+        
+        .promptflow-variation-index {
+            flex-shrink: 0;
+            width: 24px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: ${theme.background};
+            border-radius: 3px;
+            font-size: 10px;
+            color: ${theme.textDim};
+        }
+        
+        .promptflow-variation-text {
+            flex: 1;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+        
+        .promptflow-variation-copy {
+            flex-shrink: 0;
+            padding: 2px 6px;
+            background: transparent;
+            border: none;
+            color: ${theme.textDim};
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .promptflow-variation-item:hover .promptflow-variation-copy {
+            opacity: 1;
+        }
+        
+        .promptflow-variation-copy:hover {
+            color: ${theme.accent};
+        }
+        
+        .promptflow-no-variations {
+            padding: 12px;
+            text-align: center;
+            color: ${theme.textDim};
+            font-size: 11px;
+        }
+        
         /* Preset Dropdown */
         .promptflow-preset-dropdown {
             position: absolute;
@@ -771,6 +938,7 @@ class PromptFlowWidget {
         this.buildFields();
         this.buildNegativeField();
         this.buildPreview();
+        this.buildVariationsPanel();
         
         return this.container;
     }
@@ -1165,9 +1333,160 @@ class PromptFlowWidget {
         this.updatePreview();
     }
     
-    updatePreview() {
-        if (!this.previewElement) return;
+    buildVariationsPanel() {
+        const variations = document.createElement("div");
+        variations.className = "promptflow-variations";
         
+        // Header (clickable to expand)
+        const header = document.createElement("div");
+        header.className = "promptflow-variations-header";
+        
+        const titleSection = document.createElement("div");
+        titleSection.className = "promptflow-variations-title";
+        
+        const toggle = document.createElement("span");
+        toggle.className = "promptflow-variations-toggle";
+        toggle.textContent = ">";
+        
+        const label = document.createElement("span");
+        label.className = "promptflow-variations-label";
+        label.textContent = "Variations";
+        
+        this.variationsCountBadge = document.createElement("span");
+        this.variationsCountBadge.className = "promptflow-variations-count";
+        this.variationsCountBadge.textContent = "0";
+        
+        titleSection.appendChild(toggle);
+        titleSection.appendChild(label);
+        titleSection.appendChild(this.variationsCountBadge);
+        
+        header.appendChild(titleSection);
+        
+        // Content
+        this.variationsContent = document.createElement("div");
+        this.variationsContent.className = "promptflow-variations-content";
+        
+        // Toggle handler
+        header.addEventListener("click", () => {
+            const isExpanded = this.variationsContent.classList.toggle("expanded");
+            toggle.classList.toggle("expanded", isExpanded);
+            if (isExpanded) {
+                this.updateVariationsPanel();
+            }
+        });
+        
+        variations.appendChild(header);
+        variations.appendChild(this.variationsContent);
+        this.container.appendChild(variations);
+    }
+    
+    updateVariationsPanel() {
+        if (!this.variationsContent) return;
+        
+        this.variationsContent.innerHTML = "";
+        
+        // Get current prompt text
+        const promptText = this.getCurrentPromptText();
+        
+        // Find all wildcards and generate combinations
+        const wildcards = this.extractWildcards(promptText);
+        const combinations = this.generateCombinations(wildcards, promptText);
+        
+        // Update count badge
+        this.variationsCountBadge.textContent = combinations.length.toString();
+        
+        if (combinations.length === 0) {
+            const noVars = document.createElement("div");
+            noVars.className = "promptflow-no-variations";
+            noVars.textContent = "No wildcards found. Use {option1|option2|option3} syntax.";
+            this.variationsContent.appendChild(noVars);
+            return;
+        }
+        
+        // Info bar
+        const info = document.createElement("div");
+        info.className = "promptflow-variations-info";
+        
+        const infoText = document.createElement("span");
+        infoText.textContent = `${combinations.length} variation${combinations.length !== 1 ? 's' : ''} from ${wildcards.length} wildcard${wildcards.length !== 1 ? 's' : ''}`;
+        
+        const actions = document.createElement("div");
+        actions.className = "promptflow-variations-actions";
+        
+        // Copy all button
+        const copyAllBtn = document.createElement("button");
+        copyAllBtn.className = "promptflow-variations-btn";
+        copyAllBtn.textContent = "Copy All";
+        copyAllBtn.title = "Copy all variations to clipboard";
+        copyAllBtn.addEventListener("click", () => {
+            const allText = combinations.map((c, i) => `${i}: ${c}`).join("\n\n");
+            navigator.clipboard.writeText(allText).then(() => {
+                copyAllBtn.textContent = "Copied!";
+                setTimeout(() => copyAllBtn.textContent = "Copy All", 1500);
+            });
+        });
+        
+        // Seed hint
+        const seedHint = document.createElement("span");
+        seedHint.style.fontSize = "10px";
+        seedHint.style.color = this.theme.textDim;
+        seedHint.textContent = `Seeds 0-${combinations.length - 1}`;
+        seedHint.title = "Use these seed values to get each variation";
+        
+        actions.appendChild(seedHint);
+        actions.appendChild(copyAllBtn);
+        
+        info.appendChild(infoText);
+        info.appendChild(actions);
+        this.variationsContent.appendChild(info);
+        
+        // Variations list (limit to 50 for performance)
+        const list = document.createElement("div");
+        list.className = "promptflow-variations-list";
+        
+        const displayLimit = Math.min(combinations.length, 50);
+        for (let i = 0; i < displayLimit; i++) {
+            const item = document.createElement("div");
+            item.className = "promptflow-variation-item";
+            
+            const index = document.createElement("span");
+            index.className = "promptflow-variation-index";
+            index.textContent = i.toString();
+            
+            const text = document.createElement("span");
+            text.className = "promptflow-variation-text";
+            text.textContent = combinations[i];
+            
+            const copyBtn = document.createElement("button");
+            copyBtn.className = "promptflow-variation-copy";
+            copyBtn.textContent = "Copy";
+            copyBtn.title = "Copy this variation";
+            copyBtn.addEventListener("click", () => {
+                navigator.clipboard.writeText(combinations[i]).then(() => {
+                    copyBtn.textContent = "OK!";
+                    setTimeout(() => copyBtn.textContent = "Copy", 1000);
+                });
+            });
+            
+            item.appendChild(index);
+            item.appendChild(text);
+            item.appendChild(copyBtn);
+            list.appendChild(item);
+        }
+        
+        if (combinations.length > displayLimit) {
+            const more = document.createElement("div");
+            more.className = "promptflow-variation-item";
+            more.style.justifyContent = "center";
+            more.style.color = this.theme.textDim;
+            more.textContent = `... and ${combinations.length - displayLimit} more`;
+            list.appendChild(more);
+        }
+        
+        this.variationsContent.appendChild(list);
+    }
+    
+    getCurrentPromptText() {
         const fields = this.data.mode === "simple" ? SIMPLE_FIELDS : EXTENDED_FIELDS;
         const parts = [];
         
@@ -1178,8 +1497,68 @@ class PromptFlowWidget {
             }
         }
         
-        const previewText = parts.join(", ") || "(empty prompt)";
-        this.previewElement.textContent = previewText;
+        return parts.join(", ");
+    }
+    
+    extractWildcards(text) {
+        const pattern = /\{([^}]+)\}/g;
+        const wildcards = [];
+        let match;
+        
+        while ((match = pattern.exec(text)) !== null) {
+            const options = match[1].split("|").map(o => o.trim()).filter(o => o);
+            if (options.length > 1) {
+                wildcards.push({
+                    full: match[0],
+                    options: options
+                });
+            }
+        }
+        
+        return wildcards;
+    }
+    
+    generateCombinations(wildcards, template) {
+        if (wildcards.length === 0) return [];
+        
+        // Calculate total combinations
+        const totalCombinations = wildcards.reduce((acc, w) => acc * w.options.length, 1);
+        
+        // Limit to prevent browser hang
+        const maxCombinations = 1000;
+        if (totalCombinations > maxCombinations) {
+            // Return sample combinations
+            const results = [];
+            for (let i = 0; i < maxCombinations; i++) {
+                let result = template;
+                let idx = i;
+                for (const wildcard of wildcards) {
+                    const optionIdx = idx % wildcard.options.length;
+                    result = result.replace(wildcard.full, wildcard.options[optionIdx]);
+                    idx = Math.floor(idx / wildcard.options.length);
+                }
+                results.push(result);
+            }
+            return results;
+        }
+        
+        // Generate all combinations using Cartesian product
+        const results = [];
+        
+        function generate(index, current) {
+            if (index === wildcards.length) {
+                results.push(current);
+                return;
+            }
+            
+            const wildcard = wildcards[index];
+            for (const option of wildcard.options) {
+                generate(index + 1, current.replace(wildcard.full, option));
+            }
+        }
+        
+        generate(0, template);
+        return results;
     }
     
     async showCategoryPresets(category, targetEl) {
@@ -1656,6 +2035,27 @@ class PromptFlowWidget {
         });
         
         input.click();
+    }
+    
+    updatePreview() {
+        if (!this.previewElement) return;
+        
+        const previewText = this.getCurrentPromptText() || "(empty prompt)";
+        this.previewElement.textContent = previewText;
+        
+        // Update variations count badge
+        if (this.variationsCountBadge) {
+            const wildcards = this.extractWildcards(previewText);
+            const count = wildcards.length > 0 
+                ? wildcards.reduce((acc, w) => acc * w.options.length, 1)
+                : 0;
+            this.variationsCountBadge.textContent = count > 1000 ? "1000+" : count.toString();
+            
+            // Update panel if expanded
+            if (this.variationsContent?.classList.contains("expanded")) {
+                this.updateVariationsPanel();
+            }
+        }
     }
 }
 
