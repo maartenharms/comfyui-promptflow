@@ -188,6 +188,162 @@ const FIELD_MODES = [
 ];
 
 // ============================================================================
+// AUTO-CATEGORIZE TAG DATABASE
+// ============================================================================
+
+const TAG_DATABASE = {
+    // Subject/Character descriptors
+    subject: [
+        "woman", "man", "girl", "boy", "person", "people", "figure",
+        "model", "portrait", "face", "body", "full body", "upper body",
+        "1girl", "1boy", "2girls", "solo", "couple", "group",
+        "animal", "cat", "dog", "dragon", "monster", "creature"
+    ],
+    
+    // Character features
+    character: [
+        "blonde", "brunette", "redhead", "black hair", "white hair", "blue hair",
+        "long hair", "short hair", "ponytail", "twintails", "braids", "curly hair",
+        "blue eyes", "green eyes", "brown eyes", "red eyes", "heterochromia",
+        "freckles", "makeup", "lipstick", "eyeshadow", "pale skin", "dark skin",
+        "muscular", "slim", "athletic", "young", "mature", "elderly",
+        "beautiful", "handsome", "cute", "pretty", "gorgeous"
+    ],
+    
+    // Outfit/Clothing
+    outfit: [
+        "dress", "suit", "shirt", "pants", "skirt", "jeans", "shorts",
+        "jacket", "coat", "hoodie", "sweater", "t-shirt", "blouse",
+        "bikini", "swimsuit", "underwear", "lingerie", "armor", "uniform",
+        "school uniform", "business suit", "casual", "formal", "elegant",
+        "hat", "glasses", "sunglasses", "jewelry", "necklace", "earrings",
+        "boots", "heels", "sneakers", "barefoot", "stockings", "gloves"
+    ],
+    
+    // Pose/Action
+    pose: [
+        "standing", "sitting", "lying", "walking", "running", "jumping",
+        "dancing", "fighting", "flying", "floating", "kneeling", "crouching",
+        "arms crossed", "hands on hips", "looking at viewer", "looking away",
+        "from behind", "from side", "from above", "from below",
+        "dynamic pose", "action pose", "relaxed", "sleeping", "crying", "laughing",
+        "holding", "reaching", "pointing", "waving"
+    ],
+    
+    // Location/Background
+    location: [
+        "indoors", "outdoors", "studio", "background", "simple background",
+        "city", "street", "building", "room", "bedroom", "kitchen", "bathroom",
+        "forest", "beach", "mountain", "ocean", "river", "lake", "sky",
+        "night", "day", "sunset", "sunrise", "dawn", "dusk",
+        "park", "garden", "castle", "temple", "church", "school",
+        "office", "cafe", "restaurant", "bar", "club", "mall",
+        "space", "fantasy", "sci-fi", "cyberpunk", "medieval", "futuristic"
+    ],
+    
+    // Style
+    style: [
+        "photorealistic", "realistic", "hyperrealistic", "photo", "photograph",
+        "anime", "manga", "cartoon", "illustration", "digital art", "painting",
+        "oil painting", "watercolor", "sketch", "drawing", "concept art",
+        "3d", "3d render", "cgi", "unreal engine", "octane render",
+        "cinematic", "dramatic", "moody", "vibrant", "colorful", "monochrome",
+        "noir", "vintage", "retro", "modern", "minimalist", "abstract",
+        "artstation", "deviantart", "trending", "award winning"
+    ],
+    
+    // Camera/Shot
+    camera: [
+        "close-up", "closeup", "medium shot", "wide shot", "full shot",
+        "portrait", "headshot", "bust shot", "cowboy shot", "full body shot",
+        "low angle", "high angle", "dutch angle", "bird's eye", "worm's eye",
+        "bokeh", "depth of field", "shallow dof", "wide angle", "telephoto",
+        "fisheye", "macro", "panorama", "split screen",
+        "35mm", "50mm", "85mm", "lens flare", "motion blur"
+    ],
+    
+    // Lighting
+    lighting: [
+        "natural light", "sunlight", "moonlight", "ambient light",
+        "studio lighting", "soft light", "hard light", "dramatic lighting",
+        "rim light", "backlight", "side light", "front light",
+        "golden hour", "blue hour", "overcast", "cloudy",
+        "neon", "glow", "volumetric", "ray tracing", "global illumination",
+        "shadows", "high contrast", "low key", "high key"
+    ],
+    
+    // Quality boosters
+    quality: [
+        "masterpiece", "best quality", "high quality", "ultra detailed",
+        "highly detailed", "intricate", "sharp", "crisp", "hd", "4k", "8k",
+        "professional", "award-winning", "stunning", "breathtaking",
+        "raw photo", "dslr", "high resolution", "uhd"
+    ],
+    
+    // For simple mode mapping
+    main_prompt: [] // Catch-all for unmatched terms
+};
+
+// Normalize text for matching
+function normalizeTag(tag) {
+    return tag.toLowerCase().trim().replace(/[_-]/g, " ");
+}
+
+// Auto-categorize a prompt string
+function autoCategorize(promptText, mode = "extended") {
+    const result = {
+        subject: [],
+        character: [],
+        outfit: [],
+        pose: [],
+        location: [],
+        style: [],
+        camera: [],
+        lighting: [],
+        quality: [],
+        custom: [],
+        main_prompt: [],
+        unmatched: []
+    };
+    
+    // Split prompt by common delimiters
+    const segments = promptText.split(/[,;]+/).map(s => s.trim()).filter(s => s);
+    
+    for (const segment of segments) {
+        const normalizedSegment = normalizeTag(segment);
+        let matched = false;
+        
+        // Check each category
+        for (const [category, keywords] of Object.entries(TAG_DATABASE)) {
+            if (category === "main_prompt") continue;
+            
+            // Check if segment contains any keyword from this category
+            for (const keyword of keywords) {
+                const normalizedKeyword = normalizeTag(keyword);
+                if (normalizedSegment.includes(normalizedKeyword) || 
+                    normalizedKeyword.includes(normalizedSegment)) {
+                    result[category].push(segment);
+                    matched = true;
+                    break;
+                }
+            }
+            if (matched) break;
+        }
+        
+        // If no match, put in unmatched/custom
+        if (!matched) {
+            if (mode === "simple") {
+                result.main_prompt.push(segment);
+            } else {
+                result.custom.push(segment);
+            }
+        }
+    }
+    
+    return result;
+}
+
+// ============================================================================
 // PRESET STORAGE
 // ============================================================================
 
@@ -746,6 +902,67 @@ function createStyles(theme) {
             font-size: 11px;
         }
         
+        /* Auto-Sort Modal */
+        .promptflow-autosort-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 10px;
+            background: ${theme.background};
+            border: 1px solid ${theme.border};
+            border-radius: 4px;
+            color: ${theme.text};
+            font-size: 12px;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            margin-bottom: 12px;
+        }
+        
+        .promptflow-autosort-textarea:focus {
+            border-color: ${theme.borderFocus};
+        }
+        
+        .promptflow-autosort-textarea::placeholder {
+            color: ${theme.textDim};
+        }
+        
+        .promptflow-autosort-preview {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: ${theme.surface};
+            border: 1px solid ${theme.border};
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .promptflow-autosort-category {
+            margin-bottom: 8px;
+        }
+        
+        .promptflow-autosort-category:last-child {
+            margin-bottom: 0;
+        }
+        
+        .promptflow-autosort-category-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: ${theme.accent};
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        
+        .promptflow-autosort-category-tags {
+            font-size: 11px;
+            color: ${theme.text};
+            line-height: 1.4;
+        }
+        
+        .promptflow-autosort-empty {
+            color: ${theme.textDim};
+            font-style: italic;
+        }
+        
         /* Preset Dropdown */
         .promptflow-preset-dropdown {
             position: absolute;
@@ -988,6 +1205,11 @@ class PromptFlowWidget {
             this.saveData();
             this.rebuildFields();
             this.updatePreview();
+            
+            // Toggle auto-sort button visibility
+            if (this.autoSortBtn) {
+                this.autoSortBtn.style.display = newMode === "extended" ? "block" : "none";
+            }
         });
         
         // Global preset button (opens dropdown)
@@ -1022,9 +1244,22 @@ class PromptFlowWidget {
         importBtn.title = "Import presets from JSON file";
         importBtn.addEventListener("click", () => this.importPresets());
         
+        // Auto-Sort button (only for extended mode)
+        const autoSortBtn = document.createElement("button");
+        autoSortBtn.className = "promptflow-save-btn";
+        autoSortBtn.textContent = "Auto-Sort";
+        autoSortBtn.style.background = this.theme.success;
+        autoSortBtn.title = "Paste a prompt and auto-distribute to categories";
+        autoSortBtn.addEventListener("click", () => this.showAutoSortModal());
+        this.autoSortBtn = autoSortBtn;
+        
+        // Show/hide based on mode
+        autoSortBtn.style.display = this.data.mode === "extended" ? "block" : "none";
+        
         controls.appendChild(modeSelect);
         controls.appendChild(presetBtn);
         controls.appendChild(saveBtn);
+        controls.appendChild(autoSortBtn);
         controls.appendChild(exportBtn);
         controls.appendChild(importBtn);
         
@@ -2035,6 +2270,187 @@ class PromptFlowWidget {
         });
         
         input.click();
+    }
+    
+    showAutoSortModal() {
+        const overlay = document.createElement("div");
+        overlay.className = "promptflow-modal-overlay";
+        
+        const modal = document.createElement("div");
+        modal.className = "promptflow-modal";
+        modal.style.minWidth = "450px";
+        modal.style.maxWidth = "600px";
+        
+        const title = document.createElement("div");
+        title.className = "promptflow-modal-title";
+        title.textContent = "Auto-Sort Prompt";
+        
+        const description = document.createElement("div");
+        description.style.fontSize = "11px";
+        description.style.color = this.theme.textMuted;
+        description.style.marginBottom = "12px";
+        description.textContent = "Paste a prompt below and it will be automatically distributed to the appropriate categories.";
+        
+        // Textarea for prompt input
+        const textarea = document.createElement("textarea");
+        textarea.className = "promptflow-autosort-textarea";
+        textarea.placeholder = "Paste your prompt here...\n\nExample: a beautiful woman, long blonde hair, wearing a red dress, standing in a forest, cinematic lighting, masterpiece";
+        
+        // Preview container
+        const previewContainer = document.createElement("div");
+        previewContainer.className = "promptflow-autosort-preview";
+        previewContainer.style.display = "none";
+        
+        const previewLabel = document.createElement("div");
+        previewLabel.style.fontSize = "11px";
+        previewLabel.style.fontWeight = "500";
+        previewLabel.style.color = this.theme.textMuted;
+        previewLabel.style.marginBottom = "8px";
+        previewLabel.textContent = "Preview:";
+        
+        const previewContent = document.createElement("div");
+        previewContent.id = "autosort-preview-content";
+        
+        previewContainer.appendChild(previewLabel);
+        previewContainer.appendChild(previewContent);
+        
+        // Update preview as user types
+        let categorized = null;
+        textarea.addEventListener("input", () => {
+            const text = textarea.value.trim();
+            if (!text) {
+                previewContainer.style.display = "none";
+                categorized = null;
+                return;
+            }
+            
+            categorized = autoCategorize(text, "extended");
+            previewContainer.style.display = "block";
+            
+            // Build preview
+            previewContent.innerHTML = "";
+            const categoriesToShow = ["subject", "character", "outfit", "pose", "location", "style", "camera", "lighting", "quality", "custom"];
+            
+            for (const cat of categoriesToShow) {
+                const tags = categorized[cat] || [];
+                if (tags.length === 0) continue;
+                
+                const catDiv = document.createElement("div");
+                catDiv.className = "promptflow-autosort-category";
+                
+                const label = document.createElement("div");
+                label.className = "promptflow-autosort-category-label";
+                label.textContent = cat.replace("_", " ");
+                
+                const tagsDiv = document.createElement("div");
+                tagsDiv.className = "promptflow-autosort-category-tags";
+                tagsDiv.textContent = tags.join(", ");
+                
+                catDiv.appendChild(label);
+                catDiv.appendChild(tagsDiv);
+                previewContent.appendChild(catDiv);
+            }
+            
+            if (previewContent.children.length === 0) {
+                previewContent.innerHTML = '<div class="promptflow-autosort-empty">No tags detected</div>';
+            }
+        });
+        
+        // Options
+        const optionsDiv = document.createElement("div");
+        optionsDiv.style.display = "flex";
+        optionsDiv.style.gap = "12px";
+        optionsDiv.style.marginBottom = "12px";
+        
+        const replaceLabel = document.createElement("label");
+        replaceLabel.style.display = "flex";
+        replaceLabel.style.alignItems = "center";
+        replaceLabel.style.gap = "4px";
+        replaceLabel.style.fontSize = "11px";
+        replaceLabel.style.color = this.theme.textMuted;
+        replaceLabel.style.cursor = "pointer";
+        
+        const replaceCheckbox = document.createElement("input");
+        replaceCheckbox.type = "checkbox";
+        replaceCheckbox.checked = false;
+        
+        replaceLabel.appendChild(replaceCheckbox);
+        replaceLabel.appendChild(document.createTextNode("Replace existing content (unchecked = append)"));
+        
+        optionsDiv.appendChild(replaceLabel);
+        
+        // Buttons
+        const buttons = document.createElement("div");
+        buttons.className = "promptflow-modal-buttons";
+        
+        const cancelBtn = document.createElement("button");
+        cancelBtn.className = "promptflow-modal-btn cancel";
+        cancelBtn.textContent = "Cancel";
+        cancelBtn.addEventListener("click", () => overlay.remove());
+        
+        const applyBtn = document.createElement("button");
+        applyBtn.className = "promptflow-modal-btn save";
+        applyBtn.textContent = "Apply";
+        applyBtn.addEventListener("click", () => {
+            if (!categorized) {
+                overlay.remove();
+                return;
+            }
+            
+            const replace = replaceCheckbox.checked;
+            
+            // Apply categorized content to fields
+            for (const [category, tags] of Object.entries(categorized)) {
+                if (category === "main_prompt" || category === "unmatched") continue;
+                if (tags.length === 0) continue;
+                
+                const newValue = tags.join(", ");
+                
+                if (!this.data.categories[category]) {
+                    this.data.categories[category] = { value: "", mode: "fixed" };
+                }
+                
+                if (replace || !this.data.categories[category].value) {
+                    this.data.categories[category].value = newValue;
+                } else {
+                    // Append
+                    const existing = this.data.categories[category].value.trim();
+                    this.data.categories[category].value = existing 
+                        ? `${existing}, ${newValue}`
+                        : newValue;
+                }
+            }
+            
+            this.saveData();
+            this.rebuildFields();
+            this.updatePreview();
+            overlay.remove();
+            
+            console.log("[PromptFlow] Auto-sorted prompt into categories");
+        });
+        
+        buttons.appendChild(cancelBtn);
+        buttons.appendChild(applyBtn);
+        
+        modal.appendChild(title);
+        modal.appendChild(description);
+        modal.appendChild(textarea);
+        modal.appendChild(previewContainer);
+        modal.appendChild(optionsDiv);
+        modal.appendChild(buttons);
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+        
+        textarea.focus();
+        
+        // Close on escape
+        const escHandler = (e) => {
+            if (e.key === "Escape") {
+                overlay.remove();
+                document.removeEventListener("keydown", escHandler);
+            }
+        };
+        document.addEventListener("keydown", escHandler);
     }
     
     updatePreview() {
