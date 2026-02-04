@@ -10,149 +10,171 @@ import { app } from "../../../scripts/app.js";
 import { api } from "../../../scripts/api.js";
 
 // ============================================================================
-// THEME SYSTEM (Shared with FlowPath via localStorage)
+// THEME SYSTEM (Matching FlowPath themes)
 // ============================================================================
 
+// Theme definitions matching FlowPath for consistency
 const THEMES = {
-    modern: {
-        name: "Modern Dark",
-        background: "#1a1a2e",
-        surface: "#252540",
-        surfaceHover: "#2d2d4a",
-        border: "#3a3a5c",
-        borderFocus: "#6366f1",
-        text: "#e2e8f0",
-        textMuted: "#94a3b8",
-        textDim: "#64748b",
-        accent: "#6366f1",
-        accentHover: "#818cf8",
-        accentText: "#ffffff",
-        success: "#22c55e",
-        warning: "#f59e0b",
-        error: "#ef4444",
-        scrollbar: "#3a3a5c",
-        scrollbarHover: "#4a4a6c"
-    },
     ocean: {
-        name: "Ocean",
-        background: "#0f172a",
-        surface: "#1e293b",
-        surfaceHover: "#273449",
-        border: "#334155",
-        borderFocus: "#0ea5e9",
+        name: "Ocean Blue",
+        background: "#0a1e32",
+        surface: "#0f2942",
+        surfaceHover: "#153552",
+        border: "#1e4a6a",
+        borderFocus: "#4299e1",
         text: "#e2e8f0",
         textMuted: "#94a3b8",
         textDim: "#64748b",
-        accent: "#0ea5e9",
-        accentHover: "#38bdf8",
+        accent: "#4299e1",
+        accentHover: "#63b3ed",
         accentText: "#ffffff",
-        success: "#22c55e",
+        success: "#14b8a6",
         warning: "#f59e0b",
         error: "#ef4444",
-        scrollbar: "#334155",
-        scrollbarHover: "#475569"
+        scrollbar: "#1e4a6a",
+        scrollbarHover: "#2d6a9a"
     },
     forest: {
-        name: "Forest",
-        background: "#14201a",
-        surface: "#1c2e24",
-        surfaceHover: "#243a2e",
-        border: "#2d4a3a",
-        borderFocus: "#22c55e",
+        name: "Forest Green",
+        background: "#0a1e14",
+        surface: "#0f2a1c",
+        surfaceHover: "#153a28",
+        border: "#1e5a3a",
+        borderFocus: "#10b981",
         text: "#e2e8f0",
         textMuted: "#94a3b8",
         textDim: "#64748b",
-        accent: "#22c55e",
-        accentHover: "#4ade80",
+        accent: "#10b981",
+        accentHover: "#34d399",
+        accentText: "#ffffff",
+        success: "#10b981",
+        warning: "#d97706",
+        error: "#ef4444",
+        scrollbar: "#1e5a3a",
+        scrollbarHover: "#2d7a4a"
+    },
+    pinkpony: {
+        name: "Pink Pony Club",
+        background: "#321428",
+        surface: "#4a1e3a",
+        surfaceHover: "#5a284a",
+        border: "#7a3a5a",
+        borderFocus: "#ec4899",
+        text: "#fce7f3",
+        textMuted: "#f9a8d4",
+        textDim: "#db70a8",
+        accent: "#ec4899",
+        accentHover: "#f472b6",
         accentText: "#ffffff",
         success: "#22c55e",
         warning: "#f59e0b",
         error: "#ef4444",
-        scrollbar: "#2d4a3a",
-        scrollbarHover: "#3d5a4a"
+        scrollbar: "#7a3a5a",
+        scrollbarHover: "#9a4a7a"
     },
-    sunset: {
-        name: "Sunset",
-        background: "#1a1412",
-        surface: "#2d2420",
-        surfaceHover: "#3d322c",
-        border: "#4d423a",
+    odie: {
+        name: "Odie",
+        background: "#28190f",
+        surface: "#3d2518",
+        surfaceHover: "#4d3020",
+        border: "#6d4530",
         borderFocus: "#f97316",
-        text: "#e2e8f0",
-        textMuted: "#94a3b8",
-        textDim: "#64748b",
+        text: "#fef3c7",
+        textMuted: "#d4a574",
+        textDim: "#a67c52",
         accent: "#f97316",
         accentHover: "#fb923c",
         accentText: "#ffffff",
         success: "#22c55e",
         warning: "#f59e0b",
         error: "#ef4444",
-        scrollbar: "#4d423a",
-        scrollbarHover: "#5d524a"
+        scrollbar: "#6d4530",
+        scrollbarHover: "#8d5540"
     },
-    midnight: {
-        name: "Midnight",
-        background: "#0a0a0f",
-        surface: "#12121a",
-        surfaceHover: "#1a1a24",
-        border: "#252530",
-        borderFocus: "#8b5cf6",
+    umbrael: {
+        name: "Umbrael's Umbrage",
+        background: "#110818",
+        surface: "#1a1025",
+        surfaceHover: "#251535",
+        border: "#3a2050",
+        borderFocus: "#9333ea",
         text: "#e2e8f0",
-        textMuted: "#94a3b8",
-        textDim: "#64748b",
-        accent: "#8b5cf6",
-        accentHover: "#a78bfa",
+        textMuted: "#a78bfa",
+        textDim: "#7c5dba",
+        accent: "#9333ea",
+        accentHover: "#a855f7",
         accentText: "#ffffff",
         success: "#22c55e",
-        warning: "#f59e0b",
+        warning: "#fbbf24",
         error: "#ef4444",
-        scrollbar: "#252530",
-        scrollbarHover: "#353540"
+        scrollbar: "#3a2050",
+        scrollbarHover: "#4a3060"
     },
-    light: {
-        name: "Light",
-        background: "#f8fafc",
-        surface: "#ffffff",
-        surfaceHover: "#f1f5f9",
-        border: "#e2e8f0",
-        borderFocus: "#6366f1",
-        text: "#1e293b",
-        textMuted: "#475569",
-        textDim: "#94a3b8",
-        accent: "#6366f1",
-        accentHover: "#818cf8",
+    plainjane: {
+        name: "Plain Jane",
+        background: "#1e1e23",
+        surface: "#28282e",
+        surfaceHover: "#323238",
+        border: "#404048",
+        borderFocus: "#6b7280",
+        text: "#e2e8f0",
+        textMuted: "#9ca3af",
+        textDim: "#6b7280",
+        accent: "#6b7280",
+        accentHover: "#9ca3af",
         accentText: "#ffffff",
         success: "#22c55e",
         warning: "#f59e0b",
         error: "#ef4444",
-        scrollbar: "#e2e8f0",
-        scrollbarHover: "#cbd5e1"
+        scrollbar: "#404048",
+        scrollbarHover: "#505058"
+    },
+    batman: {
+        name: "The Dark Knight",
+        background: "#0a0a0a",
+        surface: "#141414",
+        surfaceHover: "#1e1e1e",
+        border: "#2a2a2a",
+        borderFocus: "#ffcc00",
+        text: "#e2e8f0",
+        textMuted: "#9ca3af",
+        textDim: "#6b7280",
+        accent: "#ffcc00",
+        accentHover: "#ffd633",
+        accentText: "#000000",
+        success: "#22c55e",
+        warning: "#ffcc00",
+        error: "#ef4444",
+        scrollbar: "#2a2a2a",
+        scrollbarHover: "#3a3a3a"
     }
 };
 
-// Shared theme storage key (used by both FlowPath and PromptFlow)
-const THEME_STORAGE_KEY = "mern_extensions_theme";
-const CUSTOM_THEMES_KEY = "mern_extensions_custom_themes";
+// Global settings
+let globalSettings = {
+    theme: "umbrael"
+};
 
+// Get active theme
 function getActiveTheme() {
-    const themeName = localStorage.getItem(THEME_STORAGE_KEY) || "modern";
-    
-    // Check built-in themes first
-    if (THEMES[themeName]) {
-        return THEMES[themeName];
-    }
-    
-    // Check custom themes
-    try {
-        const customThemes = JSON.parse(localStorage.getItem(CUSTOM_THEMES_KEY) || "{}");
-        if (customThemes[themeName]) {
-            return customThemes[themeName];
+    return THEMES[globalSettings.theme] || THEMES.umbrael;
+}
+
+// Set theme and trigger re-render
+function setTheme(themeKey) {
+    if (THEMES[themeKey]) {
+        globalSettings.theme = themeKey;
+        // Re-render all PromptFlow nodes
+        if (app.graph && app.graph._nodes) {
+            const nodes = app.graph._nodes.filter(n => n.comfyClass === "PromptFlowCore");
+            nodes.forEach(node => {
+                if (node.promptFlowWidget) {
+                    node.promptFlowWidget.theme = THEMES[themeKey];
+                    node.promptFlowWidget.injectStyles();
+                }
+            });
         }
-    } catch (e) {
-        console.warn("[PromptFlow] Error loading custom theme:", e);
     }
-    
-    return THEMES.modern;
 }
 
 // ============================================================================
@@ -1063,7 +1085,6 @@ function createStyles(theme) {
         
         .promptflow-preset-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
             padding: 8px 12px;
             font-size: 12px;
@@ -1341,12 +1362,22 @@ class PromptFlowWidget {
         // Show/hide based on mode
         autoSortBtn.style.display = this.data.mode === "extended" ? "block" : "none";
         
+        // Settings/Theme button
+        const settingsBtn = document.createElement("button");
+        settingsBtn.className = "promptflow-preset-btn";
+        settingsBtn.innerHTML = "&#9881;"; // Gear icon
+        settingsBtn.style.padding = "4px 8px";
+        settingsBtn.style.fontSize = "14px";
+        settingsBtn.title = "Theme settings";
+        settingsBtn.addEventListener("click", (e) => this.showThemeSelector(e.target));
+        
         controls.appendChild(modeSelect);
         controls.appendChild(presetBtn);
         controls.appendChild(saveBtn);
         controls.appendChild(autoSortBtn);
         controls.appendChild(exportBtn);
         controls.appendChild(importBtn);
+        controls.appendChild(settingsBtn);
         
         header.appendChild(title);
         header.appendChild(controls);
@@ -2593,6 +2624,97 @@ class PromptFlowWidget {
         }
     }
     
+    showThemeSelector(targetEl) {
+        // Remove any existing dropdown
+        document.querySelectorAll(".promptflow-preset-dropdown").forEach(el => el.remove());
+        
+        const dropdown = document.createElement("div");
+        dropdown.className = "promptflow-preset-dropdown";
+        dropdown.style.minWidth = "180px";
+        
+        // Add title
+        const title = document.createElement("div");
+        title.className = "promptflow-preset-divider";
+        title.textContent = "Select Theme";
+        dropdown.appendChild(title);
+        
+        // Add theme options
+        for (const [key, theme] of Object.entries(THEMES)) {
+            const item = document.createElement("div");
+            item.className = "promptflow-preset-item";
+            item.style.cursor = "pointer";
+            
+            // Color swatch
+            const swatch = document.createElement("span");
+            swatch.style.cssText = `
+                width: 16px;
+                height: 16px;
+                border-radius: 3px;
+                background: ${theme.accent};
+                margin-right: 8px;
+                flex-shrink: 0;
+            `;
+            
+            const label = document.createElement("span");
+            label.textContent = theme.name;
+            label.style.flex = "1";
+            
+            // Check mark for current theme
+            if (globalSettings.theme === key) {
+                const check = document.createElement("span");
+                check.textContent = "✓";
+                check.style.color = this.theme.accent;
+                check.style.marginLeft = "8px";
+                item.appendChild(swatch);
+                item.appendChild(label);
+                item.appendChild(check);
+            } else {
+                item.appendChild(swatch);
+                item.appendChild(label);
+            }
+            
+            item.addEventListener("click", () => {
+                // Update theme
+                globalSettings.theme = key;
+                this.theme = THEMES[key];
+                this.injectStyles();
+                
+                // Save to ComfyUI settings
+                if (app.ui.settings.setSettingValue) {
+                    app.ui.settings.setSettingValue("PromptFlow.Theme", key);
+                }
+                
+                dropdown.remove();
+                showNotification(`Theme: ${theme.name}`, "success");
+            });
+            
+            dropdown.appendChild(item);
+        }
+        
+        // Position dropdown
+        const rect = targetEl.getBoundingClientRect();
+        dropdown.style.position = "fixed";
+        dropdown.style.top = `${rect.bottom + 4}px`;
+        dropdown.style.left = `${rect.left}px`;
+        
+        document.body.appendChild(dropdown);
+        
+        // Adjust if off-screen
+        const dropRect = dropdown.getBoundingClientRect();
+        if (dropRect.right > window.innerWidth) {
+            dropdown.style.left = `${window.innerWidth - dropRect.width - 10}px`;
+        }
+        
+        // Close on outside click
+        const closeHandler = (e) => {
+            if (!dropdown.contains(e.target) && e.target !== targetEl) {
+                dropdown.remove();
+                document.removeEventListener("click", closeHandler);
+            }
+        };
+        setTimeout(() => document.addEventListener("click", closeHandler), 0);
+    }
+    
     showContextMenu(e, fieldId, textarea) {
         e.preventDefault();
         
@@ -2702,6 +2824,28 @@ class PromptFlowWidget {
 
 app.registerExtension({
     name: "PromptFlow.Widget",
+    
+    async setup() {
+        // Add theme setting to ComfyUI's settings menu
+        app.ui.settings.addSetting({
+            id: "PromptFlow.Theme",
+            name: "PromptFlow Theme",
+            type: "combo",
+            tooltip: "Choose a color theme for PromptFlow nodes",
+            options: Object.entries(THEMES).map(([key, theme]) => ({
+                value: key,
+                text: theme.name
+            })),
+            defaultValue: "umbrael",
+            onChange: (value) => {
+                setTheme(value);
+            }
+        });
+        
+        // Load saved theme
+        const savedTheme = app.ui.settings.getSettingValue("PromptFlow.Theme", "umbrael");
+        globalSettings.theme = savedTheme;
+    },
     
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name !== NODE_TYPE) return;
