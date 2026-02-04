@@ -963,6 +963,53 @@ function createStyles(theme) {
             font-style: italic;
         }
         
+        /* Context Menu */
+        .promptflow-context-menu {
+            position: fixed;
+            z-index: 10001;
+            min-width: 150px;
+            background: ${theme.surface};
+            border: 1px solid ${theme.border};
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            padding: 4px 0;
+        }
+        
+        .promptflow-context-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: ${theme.text};
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        
+        .promptflow-context-item:hover {
+            background: ${theme.surfaceHover};
+        }
+        
+        .promptflow-context-item.danger {
+            color: ${theme.error};
+        }
+        
+        .promptflow-context-item.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .promptflow-context-divider {
+            height: 1px;
+            background: ${theme.border};
+            margin: 4px 0;
+        }
+        
+        .promptflow-context-item-icon {
+            width: 16px;
+            text-align: center;
+            opacity: 0.7;
+        }
+        
         /* Preset Dropdown */
         .promptflow-preset-dropdown {
             position: absolute;
@@ -1347,6 +1394,7 @@ class PromptFlowWidget {
             this.saveData();
             this.updatePreview();
         });
+        textarea.addEventListener("contextmenu", (e) => this.showContextMenu(e, field.id, textarea));
         
         fieldEl.appendChild(header);
         fieldEl.appendChild(textarea);
@@ -1468,6 +1516,7 @@ class PromptFlowWidget {
             this.saveData();
             this.updatePreview();
         });
+        textarea.addEventListener("contextmenu", (e) => this.showContextMenu(e, field.id, textarea));
         
         content.appendChild(textarea);
         
@@ -1544,6 +1593,7 @@ class PromptFlowWidget {
             this.data.negative = e.target.value;
             this.saveData();
         });
+        textarea.addEventListener("contextmenu", (e) => this.showContextMenu(e, "negative", textarea));
         
         negativeSection.appendChild(header);
         negativeSection.appendChild(textarea);
@@ -2472,6 +2522,108 @@ class PromptFlowWidget {
                 this.updateVariationsPanel();
             }
         }
+    }
+    
+    showContextMenu(e, fieldId, textarea) {
+        e.preventDefault();
+        
+        // Remove existing context menus
+        document.querySelectorAll(".promptflow-context-menu").forEach(el => el.remove());
+        
+        const menu = document.createElement("div");
+        menu.className = "promptflow-context-menu";
+        
+        const items = [
+            { icon: "Copy", label: "Copy", action: () => {
+                if (textarea.value) {
+                    navigator.clipboard.writeText(textarea.value);
+                }
+            }},
+            { icon: "Paste", label: "Paste", action: async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    textarea.value = text;
+                    textarea.dispatchEvent(new Event("input"));
+                } catch (err) {
+                    console.warn("[PromptFlow] Clipboard access denied");
+                }
+            }},
+            { divider: true },
+            { icon: "Save", label: "Save as Preset", action: () => {
+                const value = textarea.value.trim();
+                if (!value) return;
+                
+                const name = prompt("Preset name:");
+                if (name) {
+                    saveCustomPreset("categories", {
+                        category: fieldId,
+                        name: name,
+                        value: value
+                    });
+                    console.log("[PromptFlow] Saved preset for", fieldId);
+                }
+            }},
+            { divider: true },
+            { icon: "Clear", label: "Clear", className: "danger", action: () => {
+                textarea.value = "";
+                textarea.dispatchEvent(new Event("input"));
+            }}
+        ];
+        
+        for (const item of items) {
+            if (item.divider) {
+                const divider = document.createElement("div");
+                divider.className = "promptflow-context-divider";
+                menu.appendChild(divider);
+                continue;
+            }
+            
+            const menuItem = document.createElement("div");
+            menuItem.className = "promptflow-context-item" + (item.className ? ` ${item.className}` : "");
+            
+            const icon = document.createElement("span");
+            icon.className = "promptflow-context-item-icon";
+            icon.textContent = item.icon === "Copy" ? "📋" : 
+                              item.icon === "Paste" ? "📎" :
+                              item.icon === "Save" ? "💾" :
+                              item.icon === "Clear" ? "🗑️" : "";
+            
+            const label = document.createElement("span");
+            label.textContent = item.label;
+            
+            menuItem.appendChild(icon);
+            menuItem.appendChild(label);
+            menuItem.addEventListener("click", () => {
+                item.action();
+                menu.remove();
+            });
+            
+            menu.appendChild(menuItem);
+        }
+        
+        // Position menu
+        menu.style.left = `${e.clientX}px`;
+        menu.style.top = `${e.clientY}px`;
+        
+        document.body.appendChild(menu);
+        
+        // Adjust if off-screen
+        const rect = menu.getBoundingClientRect();
+        if (rect.right > window.innerWidth) {
+            menu.style.left = `${window.innerWidth - rect.width - 10}px`;
+        }
+        if (rect.bottom > window.innerHeight) {
+            menu.style.top = `${window.innerHeight - rect.height - 10}px`;
+        }
+        
+        // Close on click outside
+        const closeHandler = (e) => {
+            if (!menu.contains(e.target)) {
+                menu.remove();
+                document.removeEventListener("click", closeHandler);
+            }
+        };
+        setTimeout(() => document.addEventListener("click", closeHandler), 0);
     }
 }
 
