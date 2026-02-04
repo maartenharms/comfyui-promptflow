@@ -509,14 +509,29 @@ function createStyles(theme) {
         }
         
         .promptflow-drag-handle {
-            padding: 2px 4px;
+            padding: 2px 6px;
             color: ${theme.textDim};
             cursor: grab;
-            font-size: 12px;
+            font-size: 14px;
+            user-select: none;
+        }
+        
+        .promptflow-drag-handle:hover {
+            color: ${theme.textMuted};
         }
         
         .promptflow-drag-handle:active {
             cursor: grabbing;
+        }
+        
+        .promptflow-accordion.dragging {
+            opacity: 0.5;
+            border-color: ${theme.accent};
+        }
+        
+        .promptflow-accordion.drag-over {
+            border-color: ${theme.accent};
+            border-style: dashed;
         }
         
         .promptflow-accordion-content {
@@ -823,9 +838,27 @@ class PromptFlowWidget {
         saveBtn.title = "Save current state as preset";
         saveBtn.addEventListener("click", () => this.showSavePresetModal());
         
+        // Export button
+        const exportBtn = document.createElement("button");
+        exportBtn.className = "promptflow-preset-btn";
+        exportBtn.textContent = "Export";
+        exportBtn.style.padding = "4px 8px";
+        exportBtn.title = "Export all custom presets to JSON file";
+        exportBtn.addEventListener("click", () => this.exportPresets());
+        
+        // Import button
+        const importBtn = document.createElement("button");
+        importBtn.className = "promptflow-preset-btn";
+        importBtn.textContent = "Import";
+        importBtn.style.padding = "4px 8px";
+        importBtn.title = "Import presets from JSON file";
+        importBtn.addEventListener("click", () => this.importPresets());
+        
         controls.appendChild(modeSelect);
         controls.appendChild(presetBtn);
         controls.appendChild(saveBtn);
+        controls.appendChild(exportBtn);
+        controls.appendChild(importBtn);
         
         header.appendChild(title);
         header.appendChild(controls);
@@ -843,17 +876,30 @@ class PromptFlowWidget {
     rebuildFields() {
         this.fieldsContainer.innerHTML = "";
         
-        const fields = this.data.mode === "simple" ? SIMPLE_FIELDS : EXTENDED_FIELDS;
-        
         if (this.data.mode === "simple") {
-            // Simple mode: flat fields
-            fields.forEach(field => {
+            // Simple mode: flat fields (fixed order)
+            SIMPLE_FIELDS.forEach(field => {
                 this.fieldsContainer.appendChild(this.createSimpleField(field));
             });
         } else {
-            // Extended mode: accordions
-            fields.forEach(field => {
-                this.fieldsContainer.appendChild(this.createAccordionField(field));
+            // Extended mode: accordions (custom order)
+            // Use categoryOrder if it exists and has the right fields, otherwise use default
+            let orderedIds = this.data.categoryOrder;
+            const defaultIds = EXTENDED_FIELDS.map(f => f.id);
+            
+            // Validate order has all fields
+            if (!orderedIds || orderedIds.length !== defaultIds.length || 
+                !defaultIds.every(id => orderedIds.includes(id))) {
+                orderedIds = defaultIds;
+                this.data.categoryOrder = orderedIds;
+            }
+            
+            // Build fields in custom order
+            orderedIds.forEach(fieldId => {
+                const field = EXTENDED_FIELDS.find(f => f.id === fieldId);
+                if (field) {
+                    this.fieldsContainer.appendChild(this.createAccordionField(field));
+                }
             });
         }
     }
@@ -908,9 +954,48 @@ class PromptFlowWidget {
     createAccordionField(field) {
         const accordion = document.createElement("div");
         accordion.className = "promptflow-accordion";
+        accordion.dataset.fieldId = field.id;
+        accordion.draggable = true;
         
         const isExpanded = this.data.expandedCategories?.includes(field.id) ?? false;
         const fieldData = this.data.categories[field.id] || { value: "", mode: "fixed" };
+        
+        // Drag events
+        accordion.addEventListener("dragstart", (e) => {
+            accordion.classList.add("dragging");
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", field.id);
+            this.draggedFieldId = field.id;
+        });
+        
+        accordion.addEventListener("dragend", () => {
+            accordion.classList.remove("dragging");
+            this.draggedFieldId = null;
+            // Remove drag-over from all
+            this.fieldsContainer.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over"));
+        });
+        
+        accordion.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+            if (this.draggedFieldId && this.draggedFieldId !== field.id) {
+                accordion.classList.add("drag-over");
+            }
+        });
+        
+        accordion.addEventListener("dragleave", () => {
+            accordion.classList.remove("drag-over");
+        });
+        
+        accordion.addEventListener("drop", (e) => {
+            e.preventDefault();
+            accordion.classList.remove("drag-over");
+            
+            const draggedId = e.dataTransfer.getData("text/plain");
+            if (draggedId && draggedId !== field.id) {
+                this.reorderFields(draggedId, field.id);
+            }
+        });
         
         // Header
         const header = document.createElement("div");
@@ -942,22 +1027,20 @@ class PromptFlowWidget {
             await this.showCategoryPresets(field.id, e.target);
         });
         
-        // Mode badge (not for LoRAs)
-        if (field.id !== "loras") {
-            const modeBadge = document.createElement("span");
-            modeBadge.className = "promptflow-mode-badge";
-            modeBadge.textContent = fieldData.mode || "fixed";
-            modeBadge.addEventListener("click", (e) => {
-                e.stopPropagation();
-                this.cycleModeForField(field.id, modeBadge);
-            });
-            right.appendChild(modeBadge);
-        }
+        // Mode badge
+        const modeBadge = document.createElement("span");
+        modeBadge.className = "promptflow-mode-badge";
+        modeBadge.textContent = fieldData.mode || "fixed";
+        modeBadge.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.cycleModeForField(field.id, modeBadge);
+        });
+        right.appendChild(modeBadge);
         
         // Drag handle
         const dragHandle = document.createElement("span");
         dragHandle.className = "promptflow-drag-handle";
-        dragHandle.textContent = "...";
+        dragHandle.textContent = "⋮⋮";
         dragHandle.title = "Drag to reorder";
         
         right.appendChild(presetBtn);
@@ -1433,6 +1516,25 @@ class PromptFlowWidget {
         saveWidgetData(this.widget, this.data);
     }
     
+    reorderFields(draggedId, targetId) {
+        const order = [...this.data.categoryOrder];
+        const draggedIdx = order.indexOf(draggedId);
+        const targetIdx = order.indexOf(targetId);
+        
+        if (draggedIdx === -1 || targetIdx === -1) return;
+        
+        // Remove dragged item and insert at target position
+        order.splice(draggedIdx, 1);
+        order.splice(targetIdx, 0, draggedId);
+        
+        this.data.categoryOrder = order;
+        this.saveData();
+        this.rebuildFields();
+        this.updatePreview();
+        
+        console.log("[PromptFlow] Reordered fields:", order);
+    }
+    
     migrateData(fromMode, toMode) {
         if (fromMode === toMode) return;
         
@@ -1476,6 +1578,84 @@ class PromptFlowWidget {
         }
         
         console.log("[PromptFlow] Migrated data from", fromMode, "to", toMode);
+    }
+    
+    exportPresets() {
+        const globalPresets = getCustomPresets("global");
+        const categoryPresets = getCustomPresets("categories");
+        
+        const exportData = {
+            version: "1.0",
+            exported: new Date().toISOString(),
+            global: globalPresets,
+            categories: categoryPresets
+        };
+        
+        // Create download
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `promptflow-presets-${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        console.log("[PromptFlow] Exported presets:", globalPresets.length, "global,", Object.keys(categoryPresets).length, "category types");
+    }
+    
+    importPresets() {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+        
+        input.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const importData = JSON.parse(event.target.result);
+                    
+                    // Validate structure
+                    if (!importData.global && !importData.categories) {
+                        alert("Invalid preset file format");
+                        return;
+                    }
+                    
+                    // Merge global presets
+                    if (importData.global && Array.isArray(importData.global)) {
+                        const existing = getCustomPresets("global");
+                        const merged = [...existing, ...importData.global];
+                        localStorage.setItem(PRESET_STORAGE.global, JSON.stringify(merged));
+                    }
+                    
+                    // Merge category presets
+                    if (importData.categories && typeof importData.categories === "object") {
+                        const existing = getCustomPresets("categories");
+                        for (const [category, presets] of Object.entries(importData.categories)) {
+                            if (!existing[category]) {
+                                existing[category] = [];
+                            }
+                            existing[category] = [...existing[category], ...presets];
+                        }
+                        localStorage.setItem(PRESET_STORAGE.categories, JSON.stringify(existing));
+                    }
+                    
+                    console.log("[PromptFlow] Imported presets successfully");
+                    alert("Presets imported successfully!");
+                    
+                } catch (err) {
+                    console.error("[PromptFlow] Import error:", err);
+                    alert("Failed to import presets: " + err.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+        
+        input.click();
     }
 }
 
