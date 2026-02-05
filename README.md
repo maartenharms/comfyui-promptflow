@@ -324,6 +324,14 @@ See [LICENSE](LICENSE) file for full details.
 
 ---
 
+## 🔗 Also By Me
+
+| Extension | Description |
+|-----------|-------------|
+| [**FlowPath**](https://github.com/maartenharms/comfyui-flowpath) | Intelligent path organization for ComfyUI - A1111-style counter, template variables, auto-detection, and 7 shared themes |
+
+---
+
 ## 🙏 Credits
 
 Created by **Maarten Harms** (Mern)
