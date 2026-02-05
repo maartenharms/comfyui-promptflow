@@ -74,9 +74,14 @@ git clone https://github.com/maartenharms/comfyui-promptflow
 ```
 Then restart ComfyUI.
 
+**Method 3: Manual Download**
+1. Download the latest release ZIP
+2. Extract to `ComfyUI/custom_nodes/comfyui-promptflow`
+3. Restart ComfyUI
+
 ### Basic Usage
 
-1. **Add PromptFlow node** to your workflow
+1. **Add PromptFlow node** to your workflow (under "📝 PromptFlow" category)
 2. **Fill in prompt fields** - Or use Auto-Sort to paste existing prompts
 3. **Connect outputs:**
    - `positive` → CLIP Text Encode (positive)
@@ -209,17 +214,19 @@ Shows all wildcard combinations with selection and batch queuing.
 
 ## 🎨 Themes
 
-7 beautiful themes (shared with FlowPath):
+Choose from **7 beautiful themes** in Settings → PromptFlow → Theme:
 
-- 🌊 **Ocean Blue** - Cool, calm ocean vibes
-- 🌲 **Forest Green** - Natural, earthy tones
-- 🎠 **Pink Pony Club** - Fun, vibrant pink
-- 🧡 **Odie** - Warm orange energy
-- 💜 **Umbrael's Umbrage** - Deep purple mystery (default)
-- ⚪ **Plain Jane** - Clean, minimal gray
-- 🦇 **The Dark Knight** - Sleek dark mode
+| Theme | Primary | Accent | Vibe |
+|-------|---------|--------|------|
+| 🌊 **Ocean Blue** | Blue | Teal | Cool ocean waves |
+| 🌲 **Forest Green** | Green | Amber | Lush nature |
+| 🎠 **Pink Pony Club** | Hot Pink | White | Fun and playful |
+| 🧡 **Odie** | Orange | Sandy Tan | Warm and friendly |
+| 💜 **Umbrael's Umbrage** | Purple | Gold | Regal and mysterious (DEFAULT) |
+| ⚪ **Plain Jane** | Gray | Gray | Simple and minimal |
+| 🦇 **The Dark Knight** | Black | Yellow | For when Gotham needs you |
 
-Change theme in **ComfyUI Settings** → PromptFlow → Theme
+**Note:** Themes are shared with [FlowPath](https://github.com/maartenharms/comfyui-flowpath)!
 
 ---
 
@@ -236,50 +243,108 @@ Change theme in **ComfyUI Settings** → PromptFlow → Theme
 
 ## 📁 Example Workflows
 
-Find example workflows in the [`examples/`](examples/) folder:
+Check out the [examples folder](examples/) for ready-to-use workflows:
 
-- **Simple Mode** - Basic 3-field workflow
-- **Extended Mode + Wildcards** - Full featured with Variations
-- **LoRA Manager Integration** - Trigger words workflow
+- **PromptFlow Example Workflow (Simple).json** - Basic 3-field workflow
+- **PromptFlow Example Workflow (Extended Mode with Wildcards & Variations).json** - Full featured
+- **PromptFlow Example Workflow (LoRA Manager Integration).json** - Trigger words workflow
 
----
-
-## 🤝 Related Extensions
-
-- [🌊 FlowPath](https://github.com/maartenharms/comfyui-flowpath) - Intelligent output path organization
-
-Both extensions share the same theme system!
+All workflows include explanatory notes to help you get started!
 
 ---
 
-## ❤️ Support Development
+## 🛠️ Troubleshooting
 
-PromptFlow is **free and open source**. If you find it useful, consider supporting:
+### PromptFlow node not appearing
+1. Make sure you extracted to `ComfyUI/custom_nodes/comfyui-promptflow`
+2. Restart ComfyUI completely
+3. Check console for errors (search for "PromptFlow")
 
-[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/maartenharms)
+### Wildcards not expanding
+1. Check syntax: `{option1|option2}` for inline, `__filename__` for files
+2. For file wildcards, ensure `.txt` file exists in `ComfyUI/wildcards/`
+3. Check field mode is set to Random/Increment (not Fixed)
+
+### Auto-Sort not categorizing correctly
+1. Auto-Sort uses keyword matching - some tags may be ambiguous
+2. Review the preview before applying
+3. Manually adjust categories as needed after applying
+
+### Theme not applying
+1. Go to Settings → 📝 PromptFlow → Theme
+2. Select your theme
+3. Node should update instantly
+4. If not, try reloading ComfyUI browser tab
 
 ---
 
-## 📄 License
+## 💝 Support Development
 
-MIT License - See [LICENSE](LICENSE) for details.
+PromptFlow is **100% free and open source**
+
+If you find it useful, consider supporting development:
+
+☕ **Ko-fi:** https://ko-fi.com/maartenharms  
+⭐ **Star the repo:** https://github.com/maartenharms/comfyui-promptflow  
+📣 **Share with others:** Help spread the word!
+
+Every donation helps support continued development and new features
 
 ---
 
-## 📝 Changelog
+## 🤝 Contributing
 
-### v1.0.0 (Initial Release)
-- Simple Mode (3 fields) and Extended Mode (11 fields)
-- Expression field for facial expressions/emotions
-- Wildcard system with 4 modes (Fixed, Random, Increment, Decrement)
-- File wildcards (`__folder/filename__`)
-- PromptFlow Variations node for previewing combinations
-- Auto-Sort with 200+ keyword database
-- Drag-and-drop field reordering (Extended mode)
-- 22 built-in presets (Style, Quality, Negative)
-- Custom preset saving with export/import
-- LoRA Manager trigger words integration
-- 7 themes (shared with FlowPath)
-- Right-click context menus
-- Undo/Redo support
-- Per-field save/load buttons
+PromptFlow is open source and welcomes contributions! Whether you're fixing bugs, adding features, or improving documentation, we'd love your help.
+
+### How to Contribute
+
+1. **Report Bugs** - Open an issue describing the problem
+2. **Request Features** - Share your ideas for new features
+3. **Submit Code** - Fork, code, and submit a Pull Request
+4. **Improve Docs** - Fix typos, add examples, clarify instructions
+
+### Contribution Ideas
+
+- ✅ Add new auto-sort keywords
+- ✅ Create new preset packs
+- ✅ Improve wildcard parsing
+- ✅ Fix bugs and improve performance
+- ✅ Enhance documentation
+- ✅ Add new field types
+
+---
+
+## 📜 License
+
+**MIT License** - Free to use, modify, and distribute
+
+Copyright (c) 2026 Maarten Harms
+
+See [LICENSE](LICENSE) file for full details.
+
+---
+
+## 🙏 Credits
+
+Created by **Maarten Harms** (Mern)
+
+Special thanks to:
+- The ComfyUI community for feedback and support
+- Everyone who helped test and improve PromptFlow
+- Contributors who help make PromptFlow better
+- Users who share their workflows and presets
+
+---
+
+## 📞 Contact & Links
+
+- 🐙 **GitHub:** https://github.com/maartenharms/comfyui-promptflow
+- ☕ **Ko-fi:** https://ko-fi.com/maartenharms
+- 💬 **Discord:** @itsmern
+- 📧 **Issues:** https://github.com/maartenharms/comfyui-promptflow/issues
+
+---
+
+**Made for the ComfyUI community** 📝
+
+*Write better prompts - generate better images!*
