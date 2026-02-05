@@ -1,0 +1,11 @@
+# Sci-fi character types
+space pilot
+cyborg
+android
+bounty hunter
+space marine
+scientist
+alien diplomat
+mech pilot
+hacker
+starship captain

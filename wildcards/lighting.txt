@@ -1,0 +1,13 @@
+# Lighting styles
+soft lighting
+dramatic lighting
+golden hour
+blue hour
+studio lighting
+natural light
+rim lighting
+backlit
+volumetric lighting
+neon glow
+candlelight
+moonlight

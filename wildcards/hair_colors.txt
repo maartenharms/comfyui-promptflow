@@ -1,0 +1,13 @@
+# Hair colors
+blonde
+brunette
+black hair
+red hair
+white hair
+silver hair
+blue hair
+pink hair
+purple hair
+green hair
+auburn
+strawberry blonde

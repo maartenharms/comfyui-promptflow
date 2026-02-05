@@ -1,0 +1,13 @@
+# Basic colors for prompts
+red
+blue
+green
+yellow
+purple
+orange
+pink
+cyan
+white
+black
+gold
+silver

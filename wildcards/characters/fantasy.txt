@@ -1,0 +1,13 @@
+# Fantasy character types
+warrior
+mage
+archer
+knight
+princess
+dragon rider
+elf
+dwarf
+wizard
+necromancer
+paladin
+rogue

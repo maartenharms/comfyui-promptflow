@@ -6,6 +6,32 @@ Handles prompt building, wildcard processing, and output generation
 import json
 import re
 import random
+import os
+from pathlib import Path
+
+# Import ComfyUI's PromptServer for sending messages to frontend
+try:
+    from server import PromptServer
+
+    HAS_SERVER = True
+except ImportError:
+    HAS_SERVER = False
+
+# Import wildcard functions from parent module (lazy import to avoid circular)
+_wildcard_funcs = None
+
+
+def get_wildcard_funcs():
+    """Lazy import of wildcard functions from parent module"""
+    global _wildcard_funcs
+    if _wildcard_funcs is None:
+        try:
+            from .. import list_wildcards, get_wildcard_contents
+
+            _wildcard_funcs = {"list": list_wildcards, "get": get_wildcard_contents}
+        except ImportError:
+            _wildcard_funcs = {"list": lambda: {}, "get": lambda x: None}
+    return _wildcard_funcs
 
 
 class PromptFlowCore:
@@ -160,9 +186,13 @@ class PromptFlowCore:
 
         positive = ", ".join(positive_parts) if positive_parts else ""
 
+        # Clean up duplicate commas and whitespace
+        positive = self._cleanup_prompt(positive)
+
         # Get negative prompt
         negative = data.get("negative", "").strip()
         negative = self._process_wildcards(negative, "fixed", rng, seed)
+        negative = self._cleanup_prompt(negative)
 
         # Prepare prompt_data output (full state for debugging/chaining)
         prompt_data = json.dumps(
@@ -179,11 +209,25 @@ class PromptFlowCore:
             indent=2,
         )
 
+        # Send resolved prompt to frontend for display
+        if HAS_SERVER and unique_id is not None:
+            PromptServer.instance.send_sync(
+                "promptflow.resolved",
+                {
+                    "node_id": unique_id,
+                    "positive": positive,
+                    "negative": negative,
+                },
+            )
+
         return (positive, negative, prompt_data)
 
     def _process_wildcards(self, text, mode, rng, seed):
         """
-        Process {a|b|c} wildcard syntax in text.
+        Process wildcard syntax in text.
+        Supports both:
+        - Inline wildcards: {option1|option2|option3}
+        - File wildcards: __wildcard_name__
 
         Args:
             text: Text containing wildcards
@@ -197,35 +241,75 @@ class PromptFlowCore:
         if not text:
             return text
 
-        # Pattern to match {option1|option2|option3}
-        pattern = r"\{([^}]+)\}"
-
         # Counter for increment/decrement within same text
         wildcard_index = [0]
 
-        def replace_wildcard(match):
-            options_str = match.group(1)
-            options = [opt.strip() for opt in options_str.split("|")]
-
+        def select_option(options):
+            """Select an option based on mode"""
             if not options:
                 return ""
 
             if mode == "random":
                 return rng.choice(options)
             elif mode == "increment":
-                # Use seed + wildcard index to determine selection
                 idx = (seed + wildcard_index[0]) % len(options)
                 wildcard_index[0] += 1
                 return options[idx]
             elif mode == "decrement":
-                # Reverse direction
                 idx = (-(seed + wildcard_index[0]) - 1) % len(options)
                 wildcard_index[0] += 1
                 return options[idx]
             else:  # fixed - use first option
                 return options[0]
 
-        return re.sub(pattern, replace_wildcard, text)
+        # First, process file-based wildcards: __name__ or __path/name__
+        file_pattern = r"__([a-zA-Z0-9_\-/]+)__"
+
+        def replace_file_wildcard(match):
+            wildcard_name = match.group(1)
+            funcs = get_wildcard_funcs()
+            options = funcs["get"](wildcard_name)
+
+            if options is None or len(options) == 0:
+                # Wildcard file not found or empty, return original
+                print(
+                    f"[PromptFlow] Warning: Wildcard '__{wildcard_name}__' not found or empty"
+                )
+                return match.group(0)
+
+            return select_option(options)
+
+        text = re.sub(file_pattern, replace_file_wildcard, text)
+
+        # Then, process inline wildcards: {option1|option2|option3}
+        inline_pattern = r"\{([^}]+)\}"
+
+        def replace_inline_wildcard(match):
+            options_str = match.group(1)
+            options = [opt.strip() for opt in options_str.split("|")]
+            return select_option(options)
+
+        text = re.sub(inline_pattern, replace_inline_wildcard, text)
+
+        return text
+
+    def _cleanup_prompt(self, text):
+        """
+        Clean up duplicate commas and whitespace in prompt text.
+        """
+        if not text:
+            return text
+
+        # Replace multiple commas (with optional whitespace) with single comma
+        text = re.sub(r",(\s*,)+", ",", text)
+        # Remove leading/trailing commas and whitespace
+        text = re.sub(r"^[\s,]+|[\s,]+$", "", text)
+        # Normalize spaces around commas
+        text = re.sub(r"\s*,\s*", ", ", text)
+        # Remove multiple spaces
+        text = re.sub(r"\s+", " ", text)
+
+        return text.strip()
 
     @classmethod
     def IS_CHANGED(
